@@ -15,6 +15,10 @@ class ContactEditPage extends StatefulWidget {
 class _ContactEditPageState extends State<ContactEditPage> {
   late TextEditingController _nameController;
   late TextEditingController _phoneNumberController;
+  late TextEditingController _emailController;
+  late TextEditingController _addressController;
+  late TextEditingController _birthdayController;
+  late TextEditingController _companyController;
 
   @override
   void initState() {
@@ -22,6 +26,10 @@ class _ContactEditPageState extends State<ContactEditPage> {
     _nameController = TextEditingController(text: widget.contact?.name);
     _phoneNumberController =
         TextEditingController(text: widget.contact?.phoneNumber);
+    _emailController = TextEditingController(text: widget.contact?.email);
+    _addressController = TextEditingController(text: widget.contact?.address);
+    _birthdayController = TextEditingController(text: widget.contact?.birthday.toIso8601String());
+    _companyController = TextEditingController(text: widget.contact?.company);
   }
 
   @override
@@ -32,7 +40,7 @@ class _ContactEditPageState extends State<ContactEditPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Column(
+        child: ListView(
           children: [
             TextField(
               controller: _nameController,
@@ -42,6 +50,22 @@ class _ContactEditPageState extends State<ContactEditPage> {
               controller: _phoneNumberController,
               decoration: InputDecoration(labelText: 'Phone Number'),
             ),
+            TextField(
+              controller: _emailController,
+              decoration: InputDecoration(labelText: 'Email'),
+            ),
+            TextField(
+              controller: _addressController,
+              decoration: InputDecoration(labelText: 'Address'),
+            ),
+            TextField(
+              controller: _birthdayController,
+              decoration: InputDecoration(labelText: 'Birthday'),
+            ),
+            TextField(
+              controller: _companyController,
+              decoration: InputDecoration(labelText: 'Company'),
+            ),
             ElevatedButton(
               child: Text('Save'),
               onPressed: () {
@@ -50,6 +74,10 @@ class _ContactEditPageState extends State<ContactEditPage> {
                 final contact = Contact(
                   name: _nameController.text,
                   phoneNumber: _phoneNumberController.text,
+                  email: _emailController.text,
+                  address: _addressController.text,
+                  birthday: DateTime.parse(_birthdayController.text),
+                  company: _companyController.text,
                 );
                 if (widget.contact != null) {
                   contactProvider.updateContact(widget.contact!, contact);

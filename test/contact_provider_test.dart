@@ -6,7 +6,14 @@ void main() {
   group('ContactProvider', () {
     test('addContact adds a contact', () {
       final provider = ContactProvider();
-      final contact = Contact(name: 'Test', phoneNumber: '1234567890');
+      final contact = Contact(
+        name: 'Test', 
+        phoneNumber: '1234567890',
+        email: 'test@example.com',
+        address: '123 Test Street',
+        birthday: DateTime.now(),
+        company: 'Test Company',
+      );
 
       provider.addContact(contact);
 
@@ -15,7 +22,14 @@ void main() {
 
     test('deleteContact removes a contact', () {
       final provider = ContactProvider();
-      final contact = Contact(name: 'Test', phoneNumber: '1234567890');
+      final contact = Contact(
+        name: 'Test', 
+        phoneNumber: '1234567890',
+        email: 'test@example.com',
+        address: '123 Test Street',
+        birthday: DateTime.now(),
+        company: 'Test Company',
+      );
 
       provider.addContact(contact);
       provider.deleteContact(contact);
@@ -25,8 +39,22 @@ void main() {
 
     test('updateContact updates a contact', () {
       final provider = ContactProvider();
-      final oldContact = Contact(name: 'Test', phoneNumber: '1234567890');
-      final newContact = Contact(name: 'Updated', phoneNumber: '0987654321');
+      final oldContact = Contact(
+        name: 'Test', 
+        phoneNumber: '1234567890',
+        email: 'test@example.com',
+        address: '123 Test Street',
+        birthday: DateTime.now(),
+        company: 'Test Company',
+      );
+      final newContact = Contact(
+        name: 'Updated', 
+        phoneNumber: '987365413',
+        email: 'updated@example.com',
+        address: '123 Burleigh Street',
+        birthday: DateTime.now(),
+        company: 'Updated Company',
+      );
 
       provider.addContact(oldContact);
       provider.updateContact(oldContact, newContact);

@@ -9,8 +9,16 @@ void main() {
   group('ContactListPage', () {
     testWidgets('displays a list of contacts', (tester) async {
       final provider = ContactProvider();
-      provider.addContact(Contact(name: 'Test', phoneNumber: '1234567890'));
+      final contact = Contact(
+        name: 'Test', 
+        phoneNumber: '1234567890',
+        email: 'test@example.com',
+        address: '123 Test Street',
+        birthday: DateTime.now(),
+        company: 'Test Company',
+      );
 
+      provider.addContact(contact);
       await tester.pumpWidget(
         ChangeNotifierProvider<ContactProvider>.value(
           value: provider,
@@ -20,6 +28,9 @@ void main() {
 
       expect(find.text('Test'), findsOneWidget);
       expect(find.text('1234567890'), findsOneWidget);
+      expect(find.text('test@example.com'), findsOneWidget);
+      expect(find.text('123 Test Street'), findsOneWidget);
+      expect(find.text('Test Company'), findsOneWidget);
     });
   });
 }

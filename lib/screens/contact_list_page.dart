@@ -18,7 +18,16 @@ class ContactListPage extends StatelessWidget {
               final contact = contactProvider.contacts[index];
               return ListTile(
                 title: Text(contact.name),
-                subtitle: Text(contact.phoneNumber),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Phone: ${contact.phoneNumber}'),
+                    Text('Email: ${contact.email}'),
+                    Text('Address: ${contact.address}'),
+                    Text('Birthday: ${contact.birthday.toIso8601String()}'),
+                    Text('Company: ${contact.company}'),
+                  ],
+                ),
                 trailing: IconButton(
                   icon: Icon(Icons.delete),
                   onPressed: () {
