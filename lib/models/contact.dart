@@ -3,7 +3,6 @@ class Contact {
   String phoneNumber;
   String email;
   String address;
-  DateTime birthday;
   String company;
 
   Contact({
@@ -11,7 +10,6 @@ class Contact {
     required this.phoneNumber,
     required this.email,
     required this.address,
-    required this.birthday,
     required this.company,
   });
 }

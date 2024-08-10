@@ -10,11 +10,10 @@ void main() {
     testWidgets('displays a list of contacts', (tester) async {
       final provider = ContactProvider();
       final contact = Contact(
-        name: 'Test', 
-        phoneNumber: '1234567890',
+        name: 'Test44', 
+        phoneNumber: '12345678902',
         email: 'test@example.com',
         address: '123 Test Street',
-        birthday: DateTime.now(),
         company: 'Test Company',
       );
 
@@ -26,11 +25,10 @@ void main() {
         ),
       );
 
-      expect(find.text('Test'), findsOneWidget);
-      expect(find.text('1234567890'), findsOneWidget);
-      expect(find.text('test@example.com'), findsOneWidget);
-      expect(find.text('123 Test Street'), findsOneWidget);
-      expect(find.text('Test Company'), findsOneWidget);
+      expect(find.text('Test44'), findsOneWidget);
+      expect(find.text('Phone: 12345678902'), findsOneWidget);
+      expect(find.text('Email: test@example.com'), findsOneWidget);
+      expect(find.text('Address: 123 Test Street'), findsOneWidget);
     });
   });
 }

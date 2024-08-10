@@ -17,7 +17,6 @@ class _ContactEditPageState extends State<ContactEditPage> {
   late TextEditingController _phoneNumberController;
   late TextEditingController _emailController;
   late TextEditingController _addressController;
-  late TextEditingController _birthdayController;
   late TextEditingController _companyController;
 
   @override
@@ -28,7 +27,6 @@ class _ContactEditPageState extends State<ContactEditPage> {
         TextEditingController(text: widget.contact?.phoneNumber);
     _emailController = TextEditingController(text: widget.contact?.email);
     _addressController = TextEditingController(text: widget.contact?.address);
-    _birthdayController = TextEditingController(text: widget.contact?.birthday.toIso8601String());
     _companyController = TextEditingController(text: widget.contact?.company);
   }
 
@@ -59,10 +57,6 @@ class _ContactEditPageState extends State<ContactEditPage> {
               decoration: InputDecoration(labelText: 'Address'),
             ),
             TextField(
-              controller: _birthdayController,
-              decoration: InputDecoration(labelText: 'Birthday'),
-            ),
-            TextField(
               controller: _companyController,
               decoration: InputDecoration(labelText: 'Company'),
             ),
@@ -76,7 +70,6 @@ class _ContactEditPageState extends State<ContactEditPage> {
                   phoneNumber: _phoneNumberController.text,
                   email: _emailController.text,
                   address: _addressController.text,
-                  birthday: DateTime.parse(_birthdayController.text),
                   company: _companyController.text,
                 );
                 if (widget.contact != null) {

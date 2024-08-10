@@ -11,7 +11,6 @@ void main() {
         phoneNumber: '1234567890',
         email: 'test@example.com',
         address: '123 Test Street',
-        birthday: DateTime.now(),
         company: 'Test Company',
       );
 
@@ -27,7 +26,6 @@ void main() {
         phoneNumber: '1234567890',
         email: 'test@example.com',
         address: '123 Test Street',
-        birthday: DateTime.now(),
         company: 'Test Company',
       );
 
@@ -44,7 +42,6 @@ void main() {
         phoneNumber: '1234567890',
         email: 'test@example.com',
         address: '123 Test Street',
-        birthday: DateTime.now(),
         company: 'Test Company',
       );
       final newContact = Contact(
@@ -52,7 +49,6 @@ void main() {
         phoneNumber: '987365413',
         email: 'updated@example.com',
         address: '123 Burleigh Street',
-        birthday: DateTime.now(),
         company: 'Updated Company',
       );
 

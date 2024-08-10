@@ -24,7 +24,6 @@ class ContactListPage extends StatelessWidget {
                     Text('Phone: ${contact.phoneNumber}'),
                     Text('Email: ${contact.email}'),
                     Text('Address: ${contact.address}'),
-                    Text('Birthday: ${contact.birthday.toIso8601String()}'),
                     Text('Company: ${contact.company}'),
                   ],
                 ),
