@@ -73,12 +73,15 @@ class ContactEditPageState extends State<ContactEditPage> {
                 } else {
                   await DatabaseHelper.instance.insert(contact);
                 }
-                Navigator.pop(context);
+                popContext();
               },
             ),
           ],
         ),
       ),
     );
+  }
+  void popContext() {
+    Navigator.pop(context);
   }
 }
