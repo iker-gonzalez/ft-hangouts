@@ -13,7 +13,6 @@ void main() {
 
     testWidgets('displays a list of contacts', (tester) async {
       final contact = {
-        DatabaseHelper.columnId: 1,
         DatabaseHelper.columnName: 'Test44',
         DatabaseHelper.columnPhoneNumber: '12345678902',
         DatabaseHelper.columnEmail: 'test@example.com',

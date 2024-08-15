@@ -12,11 +12,11 @@ void main() {
 
     test('addContact adds a contact', () async {
       final contact = {
-        DatabaseHelper.columnName: 'Test', 
+        DatabaseHelper.columnName: 'Test1', 
         DatabaseHelper.columnPhoneNumber: '1234567890',
-        DatabaseHelper.columnEmail: 'test@example.com',
+        DatabaseHelper.columnEmail: 'test1@example.com',
         DatabaseHelper.columnAddress: '123 Test Street',
-        DatabaseHelper.columnCompany: 'Test Company',
+        DatabaseHelper.columnCompany: 'Test1 Company',
       };
 
       await dbHelper.insert(contact);
@@ -26,11 +26,11 @@ void main() {
 
     test('deleteContact removes a contact', () async {
       final contact = {
-        DatabaseHelper.columnName: 'Test', 
+        DatabaseHelper.columnName: 'Test2', 
         DatabaseHelper.columnPhoneNumber: '1234567890',
-        DatabaseHelper.columnEmail: 'test@example.com',
+        DatabaseHelper.columnEmail: 'test2@example.com',
         DatabaseHelper.columnAddress: '123 Test Street',
-        DatabaseHelper.columnCompany: 'Test Company',
+        DatabaseHelper.columnCompany: 'Test2 Company',
       };
 
       int id = await dbHelper.insert(contact);
@@ -41,18 +41,18 @@ void main() {
 
     test('updateContact updates a contact', () async {
       final oldContact = {
-        DatabaseHelper.columnName: 'Test', 
+        DatabaseHelper.columnName: 'Test3', 
         DatabaseHelper.columnPhoneNumber: '1234567890',
-        DatabaseHelper.columnEmail: 'test@example.com',
+        DatabaseHelper.columnEmail: 'test3@example.com',
         DatabaseHelper.columnAddress: '123 Test Street',
         DatabaseHelper.columnCompany: 'Test Company',
       };
       final newContact = {
-        DatabaseHelper.columnName: 'Updated', 
+        DatabaseHelper.columnName: 'Test4 updated', 
         DatabaseHelper.columnPhoneNumber: '987365413',
-        DatabaseHelper.columnEmail: 'updated@example.com',
+        DatabaseHelper.columnEmail: 'test4updated@example.com',
         DatabaseHelper.columnAddress: '123 Burleigh Street',
-        DatabaseHelper.columnCompany: 'Updated Company',
+        DatabaseHelper.columnCompany: 'Test4 Updated Company',
       };
 
       int id = await dbHelper.insert(oldContact);
