@@ -4,11 +4,13 @@ import '../providers/contact_provider.dart';
 import 'contact_edit_page.dart';
 
 class ContactListPage extends StatelessWidget {
+  const ContactListPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Contacts'),
+        title: const Text('Contacts'),
       ),
       body: Consumer<ContactProvider>(
         builder: (context, contactProvider, child) {
@@ -28,7 +30,7 @@ class ContactListPage extends StatelessWidget {
                   ],
                 ),
                 trailing: IconButton(
-                  icon: Icon(Icons.delete),
+                  icon: const Icon(Icons.delete),
                   onPressed: () {
                     contactProvider.deleteContact(contact);
                   },
@@ -47,12 +49,12 @@ class ContactListPage extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
         onPressed: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ContactEditPage(),
+              builder: (context) => const ContactEditPage(),
             ),
           );
         },

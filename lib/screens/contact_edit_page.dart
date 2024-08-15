@@ -6,7 +6,7 @@ import '../providers/contact_provider.dart';
 class ContactEditPage extends StatefulWidget {
   final Contact? contact;
 
-  ContactEditPage({this.contact});
+  const ContactEditPage({super.key, this.contact});
 
   @override
   _ContactEditPageState createState() => _ContactEditPageState();
@@ -34,7 +34,7 @@ class _ContactEditPageState extends State<ContactEditPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Contact'),
+        title: const Text('Edit Contact'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -42,26 +42,26 @@ class _ContactEditPageState extends State<ContactEditPage> {
           children: [
             TextField(
               controller: _nameController,
-              decoration: InputDecoration(labelText: 'Name'),
+              decoration: const InputDecoration(labelText: 'Name'),
             ),
             TextField(
               controller: _phoneNumberController,
-              decoration: InputDecoration(labelText: 'Phone Number'),
+              decoration: const InputDecoration(labelText: 'Phone Number'),
             ),
             TextField(
               controller: _emailController,
-              decoration: InputDecoration(labelText: 'Email'),
+              decoration: const InputDecoration(labelText: 'Email'),
             ),
             TextField(
               controller: _addressController,
-              decoration: InputDecoration(labelText: 'Address'),
+              decoration: const InputDecoration(labelText: 'Address'),
             ),
             TextField(
               controller: _companyController,
-              decoration: InputDecoration(labelText: 'Company'),
+              decoration: const InputDecoration(labelText: 'Company'),
             ),
             ElevatedButton(
-              child: Text('Save'),
+              child: const Text('Save'),
               onPressed: () {
                 final contactProvider =
                     Provider.of<ContactProvider>(context, listen: false);

@@ -7,15 +7,17 @@ void main() {
   runApp(
     ChangeNotifierProvider(
       create: (context) => ContactProvider(),
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: ContactListPage(),
     );
   }

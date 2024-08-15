@@ -21,7 +21,7 @@ void main() {
       await tester.pumpWidget(
         ChangeNotifierProvider<ContactProvider>.value(
           value: provider,
-          child: MaterialApp(home: ContactListPage()),
+          child: const MaterialApp(home: ContactListPage()),
         ),
       );
 
