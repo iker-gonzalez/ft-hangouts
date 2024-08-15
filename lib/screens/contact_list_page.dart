@@ -3,7 +3,7 @@ import '../database/database.dart';
 import 'contact_edit_page.dart';
 
 class ContactListPage extends StatefulWidget {
-  const ContactListPage({Key? key}) : super(key: key);
+  const ContactListPage({super.key});
 
   @override
   _ContactListPageState createState() => _ContactListPageState();
