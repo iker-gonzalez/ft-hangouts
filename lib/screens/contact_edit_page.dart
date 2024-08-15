@@ -68,7 +68,7 @@ class ContactEditPageState extends State<ContactEditPage> {
                   DatabaseHelper.columnCompany: _companyController.text,
                 };
                 if (widget.contact != null) {
-                  contact[DatabaseHelper.columnId] = widget.contact![DatabaseHelper.columnId];
+                  contact[DatabaseHelper.columnId] = widget.contact![DatabaseHelper.columnId].toString();
                   await DatabaseHelper.instance.update(contact);
                 } else {
                   await DatabaseHelper.instance.insert(contact);

@@ -3,7 +3,7 @@ import '../database/database.dart';
 import 'contact_edit_page.dart';
 
 class ContactListPage extends StatefulWidget {
-  const ContactListPage({super.key});
+  const ContactListPage({Key? key}) : super(key: key);
 
   @override
   _ContactListPageState createState() => _ContactListPageState();
@@ -59,7 +59,11 @@ class _ContactListPageState extends State<ContactListPage> {
                       MaterialPageRoute(
                         builder: (context) => ContactEditPage(contact: contact),
                       ),
-                    );
+                    ).then((_) {
+                      setState(() {
+                        _contactListFuture = DatabaseHelper.instance.queryAllRows();
+                      });
+                    });
                   },
                 );
               },
@@ -77,7 +81,11 @@ class _ContactListPageState extends State<ContactListPage> {
             MaterialPageRoute(
               builder: (context) => const ContactEditPage(),
             ),
-          );
+          ).then((_) {
+            setState(() {
+              _contactListFuture = DatabaseHelper.instance.queryAllRows();
+            });
+          });
         },
       ),
     );
