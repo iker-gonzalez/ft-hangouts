@@ -9,10 +9,10 @@ class ContactEditPage extends StatefulWidget {
   const ContactEditPage({super.key, this.contact});
 
   @override
-  _ContactEditPageState createState() => _ContactEditPageState();
+  ContactEditPageState createState() => ContactEditPageState();
 }
 
-class _ContactEditPageState extends State<ContactEditPage> {
+class ContactEditPageState extends State<ContactEditPage> {
   late TextEditingController _nameController;
   late TextEditingController _phoneNumberController;
   late TextEditingController _emailController;
