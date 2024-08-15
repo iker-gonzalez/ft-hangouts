@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ft_hangouts/database/database.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   group('DatabaseHelper', () {
     late DatabaseHelper dbHelper;
 
@@ -11,11 +12,11 @@ void main() {
 
     test('addContact adds a contact', () async {
       final contact = {
-        'name': 'Test', 
-        'phoneNumber': '1234567890',
-        'email': 'test@example.com',
-        'address': '123 Test Street',
-        'company': 'Test Company',
+        DatabaseHelper.columnName: 'Test', 
+        DatabaseHelper.columnPhoneNumber: '1234567890',
+        DatabaseHelper.columnEmail: 'test@example.com',
+        DatabaseHelper.columnAddress: '123 Test Street',
+        DatabaseHelper.columnCompany: 'Test Company',
       };
 
       await dbHelper.insert(contact);
@@ -25,11 +26,11 @@ void main() {
 
     test('deleteContact removes a contact', () async {
       final contact = {
-        'name': 'Test', 
-        'phoneNumber': '1234567890',
-        'email': 'test@example.com',
-        'address': '123 Test Street',
-        'company': 'Test Company',
+        DatabaseHelper.columnName: 'Test', 
+        DatabaseHelper.columnPhoneNumber: '1234567890',
+        DatabaseHelper.columnEmail: 'test@example.com',
+        DatabaseHelper.columnAddress: '123 Test Street',
+        DatabaseHelper.columnCompany: 'Test Company',
       };
 
       int id = await dbHelper.insert(contact);
@@ -40,22 +41,22 @@ void main() {
 
     test('updateContact updates a contact', () async {
       final oldContact = {
-        'name': 'Test', 
-        'phoneNumber': '1234567890',
-        'email': 'test@example.com',
-        'address': '123 Test Street',
-        'company': 'Test Company',
+        DatabaseHelper.columnName: 'Test', 
+        DatabaseHelper.columnPhoneNumber: '1234567890',
+        DatabaseHelper.columnEmail: 'test@example.com',
+        DatabaseHelper.columnAddress: '123 Test Street',
+        DatabaseHelper.columnCompany: 'Test Company',
       };
       final newContact = {
-        'name': 'Updated', 
-        'phoneNumber': '987365413',
-        'email': 'updated@example.com',
-        'address': '123 Burleigh Street',
-        'company': 'Updated Company',
+        DatabaseHelper.columnName: 'Updated', 
+        DatabaseHelper.columnPhoneNumber: '987365413',
+        DatabaseHelper.columnEmail: 'updated@example.com',
+        DatabaseHelper.columnAddress: '123 Burleigh Street',
+        DatabaseHelper.columnCompany: 'Updated Company',
       };
 
       int id = await dbHelper.insert(oldContact);
-      newContact['_id'] = id.toString();
+      newContact[DatabaseHelper.columnId] = id.toString();
       await dbHelper.update(newContact);
 
       expect(await dbHelper.queryAllRows(), isNot(contains(oldContact)));
