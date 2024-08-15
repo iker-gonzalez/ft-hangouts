@@ -1,62 +1,69 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ft_hangouts/providers/contact_provider.dart';
-import 'package:ft_hangouts/models/contact.dart';
+import 'package:ft_hangouts/database/database.dart';
 
 void main() {
-  group('ContactProvider', () {
-    test('addContact adds a contact', () {
-      final provider = ContactProvider();
-      final contact = Contact(
-        name: 'Test', 
-        phoneNumber: '1234567890',
-        email: 'test@example.com',
-        address: '123 Test Street',
-        company: 'Test Company',
-      );
+  group('DatabaseHelper', () {
+    late DatabaseHelper dbHelper;
 
-      provider.addContact(contact);
-
-      expect(provider.contacts, contains(contact));
+    setUpAll(() async {
+      dbHelper = await DatabaseHelper.privateConstructor('test.db');
     });
 
-    test('deleteContact removes a contact', () {
-      final provider = ContactProvider();
-      final contact = Contact(
-        name: 'Test', 
-        phoneNumber: '1234567890',
-        email: 'test@example.com',
-        address: '123 Test Street',
-        company: 'Test Company',
-      );
+    test('addContact adds a contact', () async {
+      final contact = {
+        'name': 'Test', 
+        'phoneNumber': '1234567890',
+        'email': 'test@example.com',
+        'address': '123 Test Street',
+        'company': 'Test Company',
+      };
 
-      provider.addContact(contact);
-      provider.deleteContact(contact);
+      await dbHelper.insert(contact);
 
-      expect(provider.contacts, isNot(contains(contact)));
+      expect(await dbHelper.queryAllRows(), contains(contact));
     });
 
-    test('updateContact updates a contact', () {
-      final provider = ContactProvider();
-      final oldContact = Contact(
-        name: 'Test', 
-        phoneNumber: '1234567890',
-        email: 'test@example.com',
-        address: '123 Test Street',
-        company: 'Test Company',
-      );
-      final newContact = Contact(
-        name: 'Updated', 
-        phoneNumber: '987365413',
-        email: 'updated@example.com',
-        address: '123 Burleigh Street',
-        company: 'Updated Company',
-      );
+    test('deleteContact removes a contact', () async {
+      final contact = {
+        'name': 'Test', 
+        'phoneNumber': '1234567890',
+        'email': 'test@example.com',
+        'address': '123 Test Street',
+        'company': 'Test Company',
+      };
 
-      provider.addContact(oldContact);
-      provider.updateContact(oldContact, newContact);
+      int id = await dbHelper.insert(contact);
+      await dbHelper.delete(id);
 
-      expect(provider.contacts, isNot(contains(oldContact)));
-      expect(provider.contacts, contains(newContact));
+      expect(await dbHelper.queryAllRows(), isNot(contains(contact)));
+    });
+
+    test('updateContact updates a contact', () async {
+      final oldContact = {
+        'name': 'Test', 
+        'phoneNumber': '1234567890',
+        'email': 'test@example.com',
+        'address': '123 Test Street',
+        'company': 'Test Company',
+      };
+      final newContact = {
+        'name': 'Updated', 
+        'phoneNumber': '987365413',
+        'email': 'updated@example.com',
+        'address': '123 Burleigh Street',
+        'company': 'Updated Company',
+      };
+
+      int id = await dbHelper.insert(oldContact);
+      newContact['_id'] = id.toString();
+      await dbHelper.update(newContact);
+
+      expect(await dbHelper.queryAllRows(), isNot(contains(oldContact)));
+      expect(await dbHelper.queryAllRows(), contains(newContact));
+    });
+
+    tearDown(() async {
+      await dbHelper.deleteAllRows();
     });
   });
 }

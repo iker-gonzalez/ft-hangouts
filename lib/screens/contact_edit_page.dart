@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../models/contact.dart';
-import '../providers/contact_provider.dart';
+import '../database/database.dart';
 
 class ContactEditPage extends StatefulWidget {
-  final Contact? contact;
+  final Map<String, dynamic>? contact;
 
   const ContactEditPage({super.key, this.contact});
 
@@ -22,12 +20,11 @@ class ContactEditPageState extends State<ContactEditPage> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.contact?.name);
-    _phoneNumberController =
-        TextEditingController(text: widget.contact?.phoneNumber);
-    _emailController = TextEditingController(text: widget.contact?.email);
-    _addressController = TextEditingController(text: widget.contact?.address);
-    _companyController = TextEditingController(text: widget.contact?.company);
+    _nameController = TextEditingController(text: widget.contact?[DatabaseHelper.columnName]);
+    _phoneNumberController = TextEditingController(text: widget.contact?[DatabaseHelper.columnPhoneNumber]);
+    _emailController = TextEditingController(text: widget.contact?[DatabaseHelper.columnEmail]);
+    _addressController = TextEditingController(text: widget.contact?[DatabaseHelper.columnAddress]);
+    _companyController = TextEditingController(text: widget.contact?[DatabaseHelper.columnCompany]);
   }
 
   @override
@@ -62,20 +59,19 @@ class ContactEditPageState extends State<ContactEditPage> {
             ),
             ElevatedButton(
               child: const Text('Save'),
-              onPressed: () {
-                final contactProvider =
-                    Provider.of<ContactProvider>(context, listen: false);
-                final contact = Contact(
-                  name: _nameController.text,
-                  phoneNumber: _phoneNumberController.text,
-                  email: _emailController.text,
-                  address: _addressController.text,
-                  company: _companyController.text,
-                );
+              onPressed: () async {
+                final contact = {
+                  DatabaseHelper.columnName: _nameController.text,
+                  DatabaseHelper.columnPhoneNumber: _phoneNumberController.text,
+                  DatabaseHelper.columnEmail: _emailController.text,
+                  DatabaseHelper.columnAddress: _addressController.text,
+                  DatabaseHelper.columnCompany: _companyController.text,
+                };
                 if (widget.contact != null) {
-                  contactProvider.updateContact(widget.contact!, contact);
+                  contact[DatabaseHelper.columnId] = widget.contact![DatabaseHelper.columnId];
+                  await DatabaseHelper.instance.update(contact);
                 } else {
-                  contactProvider.addContact(contact);
+                  await DatabaseHelper.instance.insert(contact);
                 }
                 Navigator.pop(context);
               },

@@ -1,10 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../providers/contact_provider.dart';
+import '../database/database.dart';
 import 'contact_edit_page.dart';
 
-class ContactListPage extends StatelessWidget {
+class ContactListPage extends StatefulWidget {
   const ContactListPage({super.key});
+
+  @override
+  _ContactListPageState createState() => _ContactListPageState();
+}
+
+class _ContactListPageState extends State<ContactListPage> {
+  late Future<List<Map<String, dynamic>>> _contactListFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _contactListFuture = DatabaseHelper.instance.queryAllRows();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,40 +24,49 @@ class ContactListPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Contacts'),
       ),
-      body: Consumer<ContactProvider>(
-        builder: (context, contactProvider, child) {
-          return ListView.builder(
-            itemCount: contactProvider.contacts.length,
-            itemBuilder: (context, index) {
-              final contact = contactProvider.contacts[index];
-              return ListTile(
-                title: Text(contact.name),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Phone: ${contact.phoneNumber}'),
-                    Text('Email: ${contact.email}'),
-                    Text('Address: ${contact.address}'),
-                    Text('Company: ${contact.company}'),
-                  ],
-                ),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () {
-                    contactProvider.deleteContact(contact);
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: _contactListFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            final contacts = snapshot.data ?? [];
+            return ListView.builder(
+              itemCount: contacts.length,
+              itemBuilder: (context, index) {
+                final contact = contacts[index];
+                return ListTile(
+                  title: Text(contact[DatabaseHelper.columnName]),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Phone: ${contact[DatabaseHelper.columnPhoneNumber]}'),
+                      Text('Email: ${contact[DatabaseHelper.columnEmail]}'),
+                      Text('Address: ${contact[DatabaseHelper.columnAddress]}'),
+                      Text('Company: ${contact[DatabaseHelper.columnCompany]}'),
+                    ],
+                  ),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () async {
+                      await DatabaseHelper.instance.delete(contact[DatabaseHelper.columnId]);
+                      setState(() {
+                        _contactListFuture = DatabaseHelper.instance.queryAllRows();
+                      });
+                    },
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ContactEditPage(contact: contact),
+                      ),
+                    );
                   },
-                ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ContactEditPage(contact: contact),
-                    ),
-                  );
-                },
-              );
-            },
-          );
+                );
+              },
+            );
+          } else {
+            return const Center(child: CircularProgressIndicator());
+          }
         },
       ),
       floatingActionButton: FloatingActionButton(
