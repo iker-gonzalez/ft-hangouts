@@ -2,10 +2,10 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DatabaseHelper {
-  static const _databaseVersion = 2;
+  static const _databaseVersion = 3;
   static const _databaseName = 'ft_hangouts.db';
 
-  static const table = 'contacts';
+  static const tableContacts = 'contacts';
 
   static const columnId = '_id';
   static const columnName = 'name';
@@ -14,6 +14,13 @@ class DatabaseHelper {
   static const columnAddress = 'address';
   static const columnCompany = 'company';
   static const columnImagePath = 'imagePath';
+
+  static const tableChatMessages = 'chat_messages';
+
+  static const columnContactId = '_contact_id';
+  static const columnMessage = 'message';
+  static const columnIsSent = 'is_sent';
+  static const columnTimestamp = 'timestamp';
 
   // make this a singleton class
   DatabaseHelper.privateConstructor(this._databasePath);
@@ -31,7 +38,8 @@ class DatabaseHelper {
 
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
   if (oldVersion < newVersion) {
-    await db.execute('DROP TABLE IF EXISTS $table');
+    await db.execute('DROP TABLE IF EXISTS $tableContacts');
+    await db.execute('DROP TABLE IF EXISTS $tableChatMessages');
     _onCreate(db, newVersion);
   }
 }
@@ -41,14 +49,14 @@ Future _initDatabase() async {
     join(_databasePath, _databaseName),
     version: _databaseVersion,
     onCreate: _onCreate,
-    onUpgrade: _onUpgrade, // Add this line
+    onUpgrade: _onUpgrade,
   );
 }
 
-  // SQL code to create the database table
+  // SQL code to create the database tables
   Future _onCreate(Database db, int version) async {
     await db.execute('''
-          CREATE TABLE $table (
+          CREATE TABLE $tableContacts (
             $columnId INTEGER PRIMARY KEY,
             $columnName TEXT NOT NULL,
             $columnPhoneNumber TEXT NOT NULL,
@@ -58,30 +66,40 @@ Future _initDatabase() async {
             $columnImagePath TEXT
           )
           ''');
+
+    await db.execute('''
+          CREATE TABLE $tableChatMessages (
+            $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
+            $columnContactId INTEGER NOT NULL,
+            $columnMessage TEXT NOT NULL,
+            $columnIsSent INTEGER NOT NULL,
+            $columnTimestamp INTEGER NOT NULL
+          )
+          ''');
   }
 
-  // Helper methods
+  //* tableContacts Helper methods *//
 
   // Inserts a row in the database where each key in the Map is a column name
   // and the value is the column value. The return value is the id of the
   // inserted row.
   Future<int> insert(Map<String, dynamic> row) async {
     Database db = await instance.database;
-    return await db.insert(table, row);
+    return await db.insert(tableContacts, row);
   }
 
   // All of the rows are returned as a list of maps, where each map is 
   // a key-value list of columns.
   Future<List<Map<String, dynamic>>> queryAllRows() async {
     Database db = await instance.database;
-    return await db.query(table);
+    return await db.query(tableContacts);
   }
 
   // All of the methods (insert, query, update, delete) can also be done using
   // raw SQL commands. This method uses a raw query to give the row count.
   Future<int> queryRowCount() async {
     Database db = await instance.database;
-    int? rowCount = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM $table'));
+    int? rowCount = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM $tableContacts'));
     return rowCount ?? 0;
   }
 
@@ -90,19 +108,40 @@ Future _initDatabase() async {
   Future<int> update(Map<String, dynamic> row) async {
     Database db = await instance.database;
     int id = int.parse(row[columnId]);
-    return await db.update(table, row, where: '$columnId = ?', whereArgs: [id]);
+    return await db.update(tableContacts, row, where: '$columnId = ?', whereArgs: [id]);
   }
 
   // Deletes the row specified by the id. The number of affected rows is 
   // returned. This should be 1 as long as the row exists.
   Future<int> delete(int id) async {
     Database db = await instance.database;
-    return await db.delete(table, where: '$columnId = ?', whereArgs: [id]);
+    return await db.delete(tableContacts, where: '$columnId = ?', whereArgs: [id]);
   }
 
   // Deletes all rows in the table. Only intended for use in tests.
   Future<int> deleteAllRows() async {
     Database db = await instance.database;
-    return await db.delete(table);
+    return await db.delete(tableContacts);
+  }
+
+  //* tableChatMessages Helper methods *//
+
+  Future<int> insertChatMessage(Map<String, dynamic> row) async {
+    Database db = await instance.database;
+    return await db.insert(tableChatMessages, row);
+  }
+
+  Future<List<Map<String, dynamic>>> queryAllChatMessages() async {
+    Database db = await instance.database;
+    return await db.query(tableChatMessages);
+  }
+
+  Future<List<Map<String, dynamic>>> queryChatMessagesByContactId(int contactId) async {
+  Database db = await instance.database;
+  return await db.query(
+    tableChatMessages,
+    where: '$columnContactId = ?',
+    whereArgs: [contactId],
+  );
   }
 }

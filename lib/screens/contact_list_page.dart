@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../database/database.dart';
 import 'contact_edit_page.dart';
+import 'chat_page.dart';
 
 class ContactListPage extends StatefulWidget {
   const ContactListPage({super.key});
@@ -44,14 +45,30 @@ class _ContactListPageState extends State<ContactListPage> {
                       Text('Company: ${contact[DatabaseHelper.columnCompany]}'),
                     ],
                   ),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: () async {
-                      await DatabaseHelper.instance.delete(contact[DatabaseHelper.columnId]);
-                      setState(() {
-                        _contactListFuture = DatabaseHelper.instance.queryAllRows();
-                      });
-                    },
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.chat),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ChatPage(contactId: contact[DatabaseHelper.columnId]),
+                            ),
+                          );
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () async {
+                          await DatabaseHelper.instance.delete(contact[DatabaseHelper.columnId]);
+                          setState(() {
+                            _contactListFuture = DatabaseHelper.instance.queryAllRows();
+                          });
+                        },
+                      ),
+                    ],
                   ),
                   onTap: () {
                     Navigator.push(

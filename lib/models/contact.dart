@@ -1,4 +1,4 @@
-import '../database/database.dart';
+import 'package:ft_hangouts/database/database.dart';
 
 class Contact {
   int id;
