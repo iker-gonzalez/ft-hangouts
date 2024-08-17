@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class HeaderComponent extends StatefulWidget implements PreferredSizeWidget {
-  const HeaderComponent({Key? key}) : super(key: key);
+  const HeaderComponent({super.key});
 
   @override
   _HeaderComponentState createState() => _HeaderComponentState();
 
   @override
-  Size get preferredSize => Size.fromHeight(kToolbarHeight); // Default AppBar height
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight); // Default AppBar height
 }
 
 class _HeaderComponentState extends State<HeaderComponent> {

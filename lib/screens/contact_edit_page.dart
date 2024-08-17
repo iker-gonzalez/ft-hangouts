@@ -8,7 +8,7 @@ import 'package:path/path.dart' as path;
 class ContactEditPage extends StatefulWidget {
   final Map<String, dynamic>? contact;
 
-  const ContactEditPage({Key? key, this.contact}) : super(key: key);
+  const ContactEditPage({super.key, this.contact});
 
   @override
   ContactEditPageState createState() => ContactEditPageState();
