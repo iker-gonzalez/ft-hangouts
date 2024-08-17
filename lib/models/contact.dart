@@ -7,6 +7,7 @@ class Contact {
   String email;
   String address;
   String company;
+  String imagePath;
 
   Contact({
     required this.id,
@@ -15,6 +16,7 @@ class Contact {
     required this.email,
     required this.address,
     required this.company,
+    required this.imagePath,
   });
 
   factory Contact.fromMap(Map<String, dynamic> map) {
@@ -25,6 +27,7 @@ class Contact {
       email: map[DatabaseHelper.columnEmail],
       address: map[DatabaseHelper.columnAddress],
       company: map[DatabaseHelper.columnCompany],
+      imagePath: map[DatabaseHelper.columnImagePath],
     );
   }
 
@@ -36,6 +39,7 @@ class Contact {
       DatabaseHelper.columnEmail: email,
       DatabaseHelper.columnAddress: address,
       DatabaseHelper.columnCompany: company,
+      DatabaseHelper.columnImagePath: imagePath,
     };
   }
 }

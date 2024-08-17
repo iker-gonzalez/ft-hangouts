@@ -98,7 +98,7 @@ class ContactEditPageState extends State<ContactEditPage> {
                   DatabaseHelper.columnEmail: _emailController.text,
                   DatabaseHelper.columnAddress: _addressController.text,
                   DatabaseHelper.columnCompany: _companyController.text,
-                  'imagePath': _imageFile?.path,
+                  DatabaseHelper.columnImagePath: _imageFile?.path,
                 };
                 if (widget.contact != null) {
                   contact[DatabaseHelper.columnId] = widget.contact![DatabaseHelper.columnId].toString();
