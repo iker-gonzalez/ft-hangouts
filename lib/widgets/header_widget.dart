@@ -11,7 +11,7 @@ class HeaderComponent extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _HeaderComponentState extends State<HeaderComponent> {
-  final ValueNotifier<Color> _colorNotifier = ValueNotifier(const Color.fromARGB(255, 0, 0, 0));
+  final ValueNotifier<Color> _colorNotifier = ValueNotifier(const Color.fromARGB(255, 230, 141, 134));
   final ValueNotifier<Locale> _localeNotifier = ValueNotifier(const Locale('en', 'US'));
 
   @override

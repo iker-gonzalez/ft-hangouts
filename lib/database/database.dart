@@ -4,7 +4,8 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DatabaseHelper {
-  static const _databaseVersion = 1;
+  static const _databaseVersion = 2;
+  static const _databaseName = 'ft_hangouts.db';
 
   static const table = 'contacts';
 
@@ -14,10 +15,11 @@ class DatabaseHelper {
   static const columnEmail = 'email';
   static const columnAddress = 'address';
   static const columnCompany = 'company';
+  static const columnImagePath = 'imagePath';
 
   // make this a singleton class
   DatabaseHelper.privateConstructor(this._databasePath);
-  static final DatabaseHelper instance = DatabaseHelper.privateConstructor("MyDatabase.db");
+  static final DatabaseHelper instance = DatabaseHelper.privateConstructor(_databaseName);
 
   // only have a single app-wide reference to the database
   static Database? _database;
@@ -29,13 +31,21 @@ class DatabaseHelper {
 
   final String _databasePath;
 
-  // this opens the database (and creates it if it doesn't exist)
-  _initDatabase() async {
-    Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, _databasePath);
-    return await openDatabase(path,
-        version: _databaseVersion, onCreate: _onCreate);
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+  if (oldVersion < newVersion) {
+    await db.execute('DROP TABLE IF EXISTS $table');
+    _onCreate(db, newVersion);
   }
+}
+
+Future _initDatabase() async {
+  return await openDatabase(
+    join(_databasePath, _databaseName),
+    version: _databaseVersion,
+    onCreate: _onCreate,
+    onUpgrade: _onUpgrade, // Add this line
+  );
+}
 
   // SQL code to create the database table
   Future _onCreate(Database db, int version) async {
@@ -46,7 +56,8 @@ class DatabaseHelper {
             $columnPhoneNumber TEXT NOT NULL,
             $columnEmail TEXT NOT NULL,
             $columnAddress TEXT NOT NULL,
-            $columnCompany TEXT NOT NULL
+            $columnCompany TEXT NOT NULL,
+            $columnImagePath TEXT
           )
           ''');
   }

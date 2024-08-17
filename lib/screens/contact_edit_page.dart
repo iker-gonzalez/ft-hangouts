@@ -1,10 +1,14 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import '../database/database.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as path;
 
 class ContactEditPage extends StatefulWidget {
   final Map<String, dynamic>? contact;
 
-  const ContactEditPage({super.key, this.contact});
+  const ContactEditPage({Key? key, this.contact}) : super(key: key);
 
   @override
   ContactEditPageState createState() => ContactEditPageState();
@@ -17,6 +21,25 @@ class ContactEditPageState extends State<ContactEditPage> {
   late TextEditingController _addressController;
   late TextEditingController _companyController;
 
+  final ImagePicker _picker = ImagePicker();
+  File? _imageFile;
+
+  Future<void> _pickImage() async {
+    try {
+      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+      if (pickedFile != null) {
+        final appDir = await getApplicationDocumentsDirectory();
+        final fileName = path.basename(pickedFile.path);
+        final savedImage = await File(pickedFile.path).copy('${appDir.path}/$fileName');
+        setState(() {
+          _imageFile = savedImage;
+        });
+      }
+    } catch (e) {
+      print('An error occurred while picking the image: $e');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -25,6 +48,10 @@ class ContactEditPageState extends State<ContactEditPage> {
     _emailController = TextEditingController(text: widget.contact?[DatabaseHelper.columnEmail]);
     _addressController = TextEditingController(text: widget.contact?[DatabaseHelper.columnAddress]);
     _companyController = TextEditingController(text: widget.contact?[DatabaseHelper.columnCompany]);
+
+    if (widget.contact != null && widget.contact![DatabaseHelper.columnImagePath] != null) {
+      _imageFile = File(widget.contact![DatabaseHelper.columnImagePath]);
+    }
   }
 
   @override
@@ -37,6 +64,11 @@ class ContactEditPageState extends State<ContactEditPage> {
         padding: const EdgeInsets.all(8.0),
         child: ListView(
           children: [
+            if (_imageFile != null) Image.file(_imageFile!),
+            TextButton(
+              onPressed: _pickImage,
+              child: const Text('Pick Image'),
+            ),
             TextField(
               controller: _nameController,
               decoration: const InputDecoration(labelText: 'Name'),
@@ -66,6 +98,7 @@ class ContactEditPageState extends State<ContactEditPage> {
                   DatabaseHelper.columnEmail: _emailController.text,
                   DatabaseHelper.columnAddress: _addressController.text,
                   DatabaseHelper.columnCompany: _companyController.text,
+                  'imagePath': _imageFile?.path,
                 };
                 if (widget.contact != null) {
                   contact[DatabaseHelper.columnId] = widget.contact![DatabaseHelper.columnId].toString();
@@ -73,15 +106,12 @@ class ContactEditPageState extends State<ContactEditPage> {
                 } else {
                   await DatabaseHelper.instance.insert(contact);
                 }
-                popContext();
+                Navigator.pop(context);
               },
             ),
           ],
         ),
       ),
     );
-  }
-  void popContext() {
-    Navigator.pop(context);
   }
 }
