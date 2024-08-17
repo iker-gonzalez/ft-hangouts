@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'screens/contact_list_page.dart';
-import 'package:ft_hangouts/database/database.dart'; // Import your DatabaseHelper class
+import 'package:ft_hangouts/database/database.dart';
+import 'package:ft_hangouts/widgets/header_widget.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Ensure Flutter is initialized
@@ -14,8 +15,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: ContactListPage(),
+    return MaterialApp(
+      home: Scaffold(
+        appBar: HeaderComponent(),
+        body: const ContactListPage(),
+      ),
     );
   }
 }
