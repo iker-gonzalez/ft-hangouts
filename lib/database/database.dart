@@ -142,6 +142,7 @@ Future _initDatabase() async {
     tableChatMessages,
     where: '$columnContactId = ?',
     whereArgs: [contactId],
+    orderBy: '$columnTimestamp DESC'
   );
   }
 }
