@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "845363712921",
+    "project_id": "ft-hangouts-a2efa",
+    "storage_bucket": "ft-hangouts-a2efa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:845363712921:android:adfaa330d88a958db5b908",
+        "android_client_info": {
+          "package_name": "com.example.ft_hangouts"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCMfhFXbSJXDhmktkikUsJDtW-tkZY2Ypk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

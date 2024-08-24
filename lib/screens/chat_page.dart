@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ft_hangouts/widgets/chat_message_widget.dart';
 import 'package:ft_hangouts/database/database.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+
 
 class ChatPage extends StatefulWidget {
   final int contactId;
@@ -20,6 +22,15 @@ class _ChatPageState extends State<ChatPage> {
   void initState() {
     super.initState();
     _fetchMessages();
+    _setupMessageListener();
+  }
+
+    void _setupMessageListener() {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      if (message.data['contactId'] == widget.contactId) {
+        _receiveMessage(message.data['text']);
+      }
+    });
   }
 
   void _fetchMessages() async {
@@ -35,6 +46,19 @@ class _ChatPageState extends State<ChatPage> {
   void _sendMessage(String text) {
     _controller.clear();
     final message = ChatMessage(text: text, isSent: true);
+    setState(() {
+      _messages.insert(0, message);
+    });
+    _dbHelper.insertChatMessage({
+      DatabaseHelper.columnMessage: message.text,
+      DatabaseHelper.columnIsSent: message.isSent ? 1 : 0,
+      DatabaseHelper.columnTimestamp: DateTime.now().millisecondsSinceEpoch,
+      DatabaseHelper.columnContactId: widget.contactId,
+    });
+  }
+
+    void _receiveMessage(String text) {
+    final message = ChatMessage(text: text, isSent: false);
     setState(() {
       _messages.insert(0, message);
     });

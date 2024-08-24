@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'screens/contact_list_page.dart';
 import 'package:ft_hangouts/database/database.dart';
 import 'package:ft_hangouts/widgets/header_widget.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Ensure Flutter is initialized
+  await Firebase.initializeApp(); 
   await DatabaseHelper.instance.database; // Initialize database
 
   runApp(const MyApp());
