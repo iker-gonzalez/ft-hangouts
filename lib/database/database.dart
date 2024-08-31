@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -25,6 +26,11 @@ class DatabaseHelper {
   // make this a singleton class
   DatabaseHelper.privateConstructor(this._databasePath);
   static final DatabaseHelper instance = DatabaseHelper.privateConstructor(_databaseName);
+
+    // Add a StreamController
+  final _controller = StreamController<List<Map<String, dynamic>>>.broadcast();
+
+  Stream<List<Map<String, dynamic>>> get messagesStream => _controller.stream;
 
   // only have a single app-wide reference to the database
   static Database? _database;
@@ -126,14 +132,17 @@ Future _initDatabase() async {
 
   //* tableChatMessages Helper methods *//
 
-  Future<int> insertChatMessage(Map<String, dynamic> row) async {
-    Database db = await instance.database;
-    return await db.insert(tableChatMessages, row);
-  }
+
 
   Future<List<Map<String, dynamic>>> queryAllChatMessages() async {
     Database db = await instance.database;
     return await db.query(tableChatMessages);
+  }
+
+  Stream<List<Map<String, dynamic>>> getMessagesStream(int contactId) {
+    return Stream.periodic(Duration(seconds: 1)).asyncMap((_) async {
+      return await queryChatMessagesByContactId(contactId);
+    });
   }
 
   Future<List<Map<String, dynamic>>> queryChatMessagesByContactId(int contactId) async {
@@ -143,6 +152,21 @@ Future _initDatabase() async {
     where: '$columnContactId = ?',
     whereArgs: [contactId],
     orderBy: '$columnTimestamp DESC'
-  );
+    );
+  }
+
+  Future<int> insertChatMessage(Map<String, dynamic> row) async {
+    Database db = await instance.database;
+    int id = await db.insert(tableChatMessages, row);
+
+    // Emit a new event with all messages for the contact
+    _controller.add(await queryChatMessagesByContactId(row[columnContactId]));
+
+    return id;
+  }
+
+  // Add a dispose method to close the StreamController
+  void dispose() {
+    _controller.close();
   }
 }
