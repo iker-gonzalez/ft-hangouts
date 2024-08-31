@@ -2,11 +2,7 @@ import 'package:telephony/telephony.dart';
 import 'package:flutter/material.dart';
 import 'package:ft_hangouts/database/database.dart';
 
-// Place this at the top of your Dart file, outside of any class
 void backgroundMessageHandler(SmsMessage message) {
-  // Handle background message
-  print("Received SMS in background: ${message.body}");
-  // Assuming you have access to the database helper instance
   DatabaseHelper.instance.insertChatMessage({
     DatabaseHelper.columnMessage: message.body ?? '',
     DatabaseHelper.columnIsSent: 0,
@@ -17,8 +13,15 @@ void backgroundMessageHandler(SmsMessage message) {
 
 class ChatPage extends StatefulWidget {
   final int contactId;
+  final String contactName;
+  final String contactPhoneNumber;
 
-  const ChatPage({super.key, required this.contactId});
+  const ChatPage({
+    super.key,
+    required this.contactId,
+    required this.contactName,
+    required this.contactPhoneNumber,
+  });
 
   @override
   _ChatPageState createState() => _ChatPageState();
@@ -45,7 +48,7 @@ class _ChatPageState extends State<ChatPage> {
       DatabaseHelper.columnTimestamp: DateTime.now().millisecondsSinceEpoch,
       DatabaseHelper.columnContactId: widget.contactId,
     });
-    sendSMS(text, "recipient_phone_number"); // Replace with actual recipient number
+    sendSMS(text, widget.contactPhoneNumber);
   }
 
   void sendSMS(String message, String recipient) async {
@@ -78,7 +81,9 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Chat')),
+      appBar: AppBar(
+        title: Text(widget.contactName),
+      ),
       body: Column(
         children: <Widget>[
           Expanded(
