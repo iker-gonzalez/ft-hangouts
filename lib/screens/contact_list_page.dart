@@ -56,7 +56,6 @@ class _ContactListPageState extends State<ContactListPage> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => ChatPage(
-                                contactId: contact[DatabaseHelper.columnId],
                                 contactName: contact[DatabaseHelper.columnName],
                                 contactPhoneNumber: contact[DatabaseHelper.columnPhoneNumber],
                               ),

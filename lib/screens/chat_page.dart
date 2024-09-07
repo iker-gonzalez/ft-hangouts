@@ -4,15 +4,13 @@ import 'package:ft_hangouts/database/database.dart';
 import '../main.dart';
 
 class ChatPage extends StatefulWidget {
-  final int contactId;
-  final String contactName;
   final String contactPhoneNumber;
+  final String contactName;
 
   const ChatPage({
     super.key,
-    required this.contactId,
-    required this.contactName,
     required this.contactPhoneNumber,
+    required this.contactName,
   });
 
   @override
@@ -28,7 +26,7 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
-    _messagesStream = _dbHelper.getMessagesStream(widget.contactId);
+    _messagesStream = _dbHelper.getMessagesStream(widget.contactPhoneNumber);
     listenForSMS();
   }
 
@@ -38,11 +36,8 @@ class _ChatPageState extends State<ChatPage> {
     _dbHelper.insertChatMessage({
       DatabaseHelper.columnMessage: text,
       DatabaseHelper.columnIsSent: 1,
-      DatabaseHelper.columnTimestamp: DateTime
-          .now()
-          .millisecondsSinceEpoch,
-      DatabaseHelper.columnContactId: widget.contactId,
-      'senderPhoneNumber': myPhoneNumber,
+      DatabaseHelper.columnTimestamp: DateTime.now().millisecondsSinceEpoch,
+      DatabaseHelper.columnContactId: widget.contactPhoneNumber,
     });
     sendSMS(text, widget.contactPhoneNumber);
   }
@@ -63,15 +58,14 @@ class _ChatPageState extends State<ChatPage> {
   void listenForSMS() {
     telephony.listenIncomingSms(
       onNewMessage: (SmsMessage message) {
-        _dbHelper.insertChatMessage({
-          DatabaseHelper.columnMessage: message.body ?? '',
-          DatabaseHelper.columnIsSent: 0,
-          DatabaseHelper.columnTimestamp: DateTime
-              .now()
-              .millisecondsSinceEpoch,
-          DatabaseHelper.columnContactId: widget.contactId,
-          'senderPhoneNumber': message.address,
-        });
+        if (message.address == widget.contactPhoneNumber) {
+          _dbHelper.insertChatMessage({
+            DatabaseHelper.columnMessage: message.body ?? '',
+            DatabaseHelper.columnIsSent: 0,
+            DatabaseHelper.columnTimestamp: DateTime.now().millisecondsSinceEpoch,
+            DatabaseHelper.columnContactId: widget.contactPhoneNumber,
+          });
+        }
       },
       onBackgroundMessage: backgroundMessageHandler,
     );
@@ -103,12 +97,10 @@ class _ChatPageState extends State<ChatPage> {
                       final message = messages[index];
                       final isSent = message[DatabaseHelper.columnIsSent] == 1;
                       return Align(
-                        alignment: isSent ? Alignment.centerRight : Alignment
-                            .centerLeft,
+                        alignment: isSent ? Alignment.centerRight : Alignment.centerLeft,
                         child: Container(
                           padding: EdgeInsets.all(8.0),
-                          margin: EdgeInsets.symmetric(
-                              vertical: 4.0, horizontal: 8.0),
+                          margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                           decoration: BoxDecoration(
                             color: isSent ? Colors.blue[100] : Colors.grey[300],
                             borderRadius: BorderRadius.circular(8.0),
@@ -156,5 +148,18 @@ class _ChatPageState extends State<ChatPage> {
         ],
       ),
     );
+  }
+}
+
+void backgroundMessageHandler(SmsMessage message) async {
+  final dbHelper = DatabaseHelper.instance;
+
+  if (message.address == message.address) {
+    dbHelper.insertChatMessage({
+      DatabaseHelper.columnMessage: message.body ?? '',
+      DatabaseHelper.columnIsSent: 0,
+      DatabaseHelper.columnTimestamp: DateTime.now().millisecondsSinceEpoch,
+      DatabaseHelper.columnContactId: message.address,
+    });
   }
 }
