@@ -22,6 +22,7 @@ class _ChatPageState extends State<ChatPage> {
   final _dbHelper = DatabaseHelper.instance;
   final Telephony telephony = Telephony.instance;
   late Stream<List<Map<String, dynamic>>> _messagesStream;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -71,6 +72,14 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
+  void _scrollDown() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,7 +100,9 @@ class _ChatPageState extends State<ChatPage> {
                   return const Center(child: Text('No messages'));
                 } else {
                   final messages = snapshot.data!;
+                  _scrollDown();
                   return ListView.builder(
+                    controller: _scrollController,
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
                       final message = messages[index];

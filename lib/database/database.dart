@@ -3,44 +3,42 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DatabaseHelper {
-  static const _databaseVersion = 5; // Increment the version
-  static const _databaseName = 'ft_hangouts.db';
+  static const _databaseName = "MyDatabase.db";
+  static const _databaseVersion = 1;
 
   static const tableContacts = 'contacts';
+  static const tableChatMessages = 'chat_messages';
 
   static const columnId = '_id';
   static const columnName = 'name';
-  static const columnPhoneNumber = 'phoneNumber';
+  static const columnPhoneNumber = 'phone_number';
   static const columnEmail = 'email';
   static const columnAddress = 'address';
   static const columnCompany = 'company';
-  static const columnImagePath = 'imagePath';
+  static const columnImagePath = 'image_path';
 
-  static const tableChatMessages = 'chat_messages';
-
-  static const columnContactId = 'contactPhoneNumber'; // Change to phone number
+  static const columnContactId = 'contact_id';
   static const columnMessage = 'message';
   static const columnIsSent = 'is_sent';
   static const columnTimestamp = 'timestamp';
 
-  // make this a singleton class
-  DatabaseHelper.privateConstructor(this._databasePath);
-  static final DatabaseHelper instance = DatabaseHelper.privateConstructor(_databaseName);
+  // Singleton instance
+  DatabaseHelper._privateConstructor();
+  static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
 
-  // Add a StreamController
+  // Only have a single app-wide reference to the database
+  static Database? _database;
   final _controller = StreamController<List<Map<String, dynamic>>>.broadcast();
 
-  Stream<List<Map<String, dynamic>>> get messagesStream => _controller.stream;
-
-  // only have a single app-wide reference to the database
-  static Database? _database;
   Future<Database> get database async {
     if (_database != null) return _database!;
     _database = await _initDatabase();
     return _database!;
   }
 
-  final String _databasePath;
+  Future<String> get _databasePath async {
+    return await getDatabasesPath();
+  }
 
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 5) {
@@ -64,14 +62,13 @@ class DatabaseHelper {
 
   Future _initDatabase() async {
     return await openDatabase(
-      join(_databasePath, _databaseName),
+      join(await _databasePath, _databaseName),
       version: _databaseVersion,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
   }
 
-  // SQL code to create the database tables
   Future _onCreate(Database db, int version) async {
     await db.execute('''
       CREATE TABLE $tableContacts (
@@ -95,8 +92,6 @@ class DatabaseHelper {
       )
     ''');
   }
-
-  //* tableContacts Helper methods *//
 
   Future<int> insert(Map<String, dynamic> row) async {
     Database db = await instance.database;
@@ -130,18 +125,13 @@ class DatabaseHelper {
     return await db.delete(tableContacts);
   }
 
-  //* tableChatMessages Helper methods *//
-
   Future<List<Map<String, dynamic>>> queryAllChatMessages() async {
     Database db = await instance.database;
     return await db.query(tableChatMessages);
   }
 
   Stream<List<Map<String, dynamic>>> getMessagesStream(String contactPhoneNumber) async* {
-    // Emit initial data
     yield await queryChatMessagesByContactId(contactPhoneNumber);
-
-    // Emit subsequent data
     yield* _controller.stream.map((messages) {
       return messages.where((message) => message[columnContactId] == contactPhoneNumber).toList();
     });
@@ -160,10 +150,7 @@ class DatabaseHelper {
   Future<int> insertChatMessage(Map<String, dynamic> row) async {
     Database db = await instance.database;
     int id = await db.insert(tableChatMessages, row);
-
-    // Emit a new event with all messages
     _controller.add(await queryAllChatMessages());
-
     return id;
   }
 
