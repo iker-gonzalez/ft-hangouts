@@ -33,12 +33,16 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void _sendMessage(String text) {
+    final String myPhoneNumber = "+34662236995";
     _controller.clear();
     _dbHelper.insertChatMessage({
       DatabaseHelper.columnMessage: text,
       DatabaseHelper.columnIsSent: 1,
-      DatabaseHelper.columnTimestamp: DateTime.now().millisecondsSinceEpoch,
+      DatabaseHelper.columnTimestamp: DateTime
+          .now()
+          .millisecondsSinceEpoch,
       DatabaseHelper.columnContactId: widget.contactId,
+      'senderPhoneNumber': myPhoneNumber,
     });
     sendSMS(text, widget.contactPhoneNumber);
   }
@@ -59,12 +63,14 @@ class _ChatPageState extends State<ChatPage> {
   void listenForSMS() {
     telephony.listenIncomingSms(
       onNewMessage: (SmsMessage message) {
-        print("New SMS received: ${message.body}");
         _dbHelper.insertChatMessage({
           DatabaseHelper.columnMessage: message.body ?? '',
           DatabaseHelper.columnIsSent: 0,
-          DatabaseHelper.columnTimestamp: DateTime.now().millisecondsSinceEpoch,
+          DatabaseHelper.columnTimestamp: DateTime
+              .now()
+              .millisecondsSinceEpoch,
           DatabaseHelper.columnContactId: widget.contactId,
+          'senderPhoneNumber': message.address,
         });
       },
       onBackgroundMessage: backgroundMessageHandler,
@@ -95,11 +101,39 @@ class _ChatPageState extends State<ChatPage> {
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
                       final message = messages[index];
-                      return ListTile(
-                        title: Text(message[DatabaseHelper.columnMessage]),
-                        subtitle: Text(DateTime.fromMillisecondsSinceEpoch(
-                            message[DatabaseHelper.columnTimestamp])
-                            .toString()),
+                      final isSent = message[DatabaseHelper.columnIsSent] == 1;
+                      return Align(
+                        alignment: isSent ? Alignment.centerRight : Alignment
+                            .centerLeft,
+                        child: Container(
+                          padding: EdgeInsets.all(8.0),
+                          margin: EdgeInsets.symmetric(
+                              vertical: 4.0, horizontal: 8.0),
+                          decoration: BoxDecoration(
+                            color: isSent ? Colors.blue[100] : Colors.grey[300],
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                message[DatabaseHelper.columnMessage],
+                                style: TextStyle(
+                                  color: isSent ? Colors.black : Colors.black87,
+                                ),
+                              ),
+                              Text(
+                                DateTime.fromMillisecondsSinceEpoch(
+                                  message[DatabaseHelper.columnTimestamp],
+                                ).toString(),
+                                style: TextStyle(
+                                  fontSize: 10.0,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       );
                     },
                   );

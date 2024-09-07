@@ -3,7 +3,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DatabaseHelper {
-  static const _databaseVersion = 3;
+  static const _databaseVersion = 4;
   static const _databaseName = 'ft_hangouts.db';
 
   static const tableContacts = 'contacts';
@@ -27,7 +27,7 @@ class DatabaseHelper {
   DatabaseHelper.privateConstructor(this._databasePath);
   static final DatabaseHelper instance = DatabaseHelper.privateConstructor(_databaseName);
 
-    // Add a StreamController
+  // Add a StreamController
   final _controller = StreamController<List<Map<String, dynamic>>>.broadcast();
 
   Stream<List<Map<String, dynamic>>> get messagesStream => _controller.stream;
@@ -43,21 +43,19 @@ class DatabaseHelper {
   final String _databasePath;
 
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
-  if (oldVersion < newVersion) {
-    await db.execute('DROP TABLE IF EXISTS $tableContacts');
-    await db.execute('DROP TABLE IF EXISTS $tableChatMessages');
-    _onCreate(db, newVersion);
+    if (oldVersion < 4) {
+      await db.execute('ALTER TABLE $tableChatMessages ADD COLUMN senderPhoneNumber TEXT NOT NULL DEFAULT ""');
+    }
   }
-}
 
-Future _initDatabase() async {
-  return await openDatabase(
-    join(_databasePath, _databaseName),
-    version: _databaseVersion,
-    onCreate: _onCreate,
-    onUpgrade: _onUpgrade,
-  );
-}
+  Future _initDatabase() async {
+    return await openDatabase(
+      join(_databasePath, _databaseName),
+      version: _databaseVersion,
+      onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
+    );
+  }
 
   // SQL code to create the database tables
   Future _onCreate(Database db, int version) async {
@@ -79,7 +77,8 @@ Future _initDatabase() async {
             $columnContactId INTEGER NOT NULL,
             $columnMessage TEXT NOT NULL,
             $columnIsSent INTEGER NOT NULL,
-            $columnTimestamp INTEGER NOT NULL
+            $columnTimestamp INTEGER NOT NULL,
+            senderPhoneNumber TEXT NOT NULL
           )
           ''');
   }
@@ -94,7 +93,7 @@ Future _initDatabase() async {
     return await db.insert(tableContacts, row);
   }
 
-  // All of the rows are returned as a list of maps, where each map is 
+  // All of the rows are returned as a list of maps, where each map is
   // a key-value list of columns.
   Future<List<Map<String, dynamic>>> queryAllRows() async {
     Database db = await instance.database;
@@ -109,7 +108,7 @@ Future _initDatabase() async {
     return rowCount ?? 0;
   }
 
-  // We are assuming here that the id column in the map is set. The other 
+  // We are assuming here that the id column in the map is set. The other
   // column values will be used to update the row.
   Future<int> update(Map<String, dynamic> row) async {
     Database db = await instance.database;
@@ -117,7 +116,7 @@ Future _initDatabase() async {
     return await db.update(tableContacts, row, where: '$columnId = ?', whereArgs: [id]);
   }
 
-  // Deletes the row specified by the id. The number of affected rows is 
+  // Deletes the row specified by the id. The number of affected rows is
   // returned. This should be 1 as long as the row exists.
   Future<int> delete(int id) async {
     Database db = await instance.database;
@@ -132,8 +131,6 @@ Future _initDatabase() async {
 
   //* tableChatMessages Helper methods *//
 
-
-
   Future<List<Map<String, dynamic>>> queryAllChatMessages() async {
     Database db = await instance.database;
     return await db.query(tableChatMessages);
@@ -146,12 +143,12 @@ Future _initDatabase() async {
   }
 
   Future<List<Map<String, dynamic>>> queryChatMessagesByContactId(int contactId) async {
-  Database db = await instance.database;
-  return await db.query(
-    tableChatMessages,
-    where: '$columnContactId = ?',
-    whereArgs: [contactId],
-    orderBy: '$columnTimestamp DESC'
+    Database db = await instance.database;
+    return await db.query(
+        tableChatMessages,
+        where: '$columnContactId = ?',
+        whereArgs: [contactId],
+        orderBy: '$columnTimestamp DESC'
     );
   }
 
