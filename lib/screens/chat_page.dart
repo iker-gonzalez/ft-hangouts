@@ -1,15 +1,7 @@
 import 'package:telephony/telephony.dart';
 import 'package:flutter/material.dart';
 import 'package:ft_hangouts/database/database.dart';
-
-void backgroundMessageHandler(SmsMessage message) {
-  DatabaseHelper.instance.insertChatMessage({
-    DatabaseHelper.columnMessage: message.body ?? '',
-    DatabaseHelper.columnIsSent: 0,
-    DatabaseHelper.columnTimestamp: DateTime.now().millisecondsSinceEpoch,
-    DatabaseHelper.columnContactId: message.address, // Adjust as needed
-  });
-}
+import '../main.dart';
 
 class ChatPage extends StatefulWidget {
   final int contactId;
@@ -67,6 +59,7 @@ class _ChatPageState extends State<ChatPage> {
   void listenForSMS() {
     telephony.listenIncomingSms(
       onNewMessage: (SmsMessage message) {
+        print("New SMS received: ${message.body}");
         _dbHelper.insertChatMessage({
           DatabaseHelper.columnMessage: message.body ?? '',
           DatabaseHelper.columnIsSent: 0,

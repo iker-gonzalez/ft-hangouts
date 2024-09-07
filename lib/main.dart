@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:telephony/telephony.dart';
 import 'screens/contact_list_page.dart';
 import 'package:ft_hangouts/database/database.dart';
 import 'package:ft_hangouts/widgets/header_widget.dart';
-import 'package:telephony/telephony.dart';
+
+// Top-level function to handle background messages
+void backgroundMessageHandler(SmsMessage message) async {
+  // Handle background message
+  DatabaseHelper.instance.insertChatMessage({
+    DatabaseHelper.columnMessage: message.body ?? '',
+    DatabaseHelper.columnIsSent: 0,
+    DatabaseHelper.columnTimestamp: DateTime.now().millisecondsSinceEpoch,
+    DatabaseHelper.columnContactId: message.address, // Adjust as needed
+  });
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Ensure Flutter is initialized
-
   await DatabaseHelper.instance.database; // Initialize database
-
-  final Telephony telephony = Telephony.instance;
-
-  bool? permissionsGranted = await telephony.requestPhoneAndSmsPermissions;
-  if (permissionsGranted != null && permissionsGranted) {
-    runApp(const MyApp());
-  } else {
-    print("SMS permissions not granted");
-  }
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
