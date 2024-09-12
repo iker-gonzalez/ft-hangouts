@@ -1,7 +1,7 @@
 import 'package:telephony/telephony.dart';
 import 'package:flutter/material.dart';
 import 'package:ft_hangouts/database/database.dart';
-import '../main.dart';
+import '../models/chat_message.dart';
 
 class ChatPage extends StatefulWidget {
   final String contactPhoneNumber;
@@ -21,25 +21,26 @@ class _ChatPageState extends State<ChatPage> {
   final _controller = TextEditingController();
   final _dbHelper = DatabaseHelper.instance;
   final Telephony telephony = Telephony.instance;
-  late Stream<List<Map<String, dynamic>>> _messagesStream;
+  late Stream<List<ChatMessage>> _messagesStream;
   final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    _messagesStream = _dbHelper.getMessagesStream(widget.contactPhoneNumber);
+    _messagesStream = _dbHelper.getMessagesStream(widget.contactPhoneNumber).map(
+          (event) => event.map((e) => ChatMessage.fromMap(e)).toList(),
+    );
     listenForSMS();
   }
 
   void _sendMessage(String text) {
-    final String myPhoneNumber = "+34662236995";
     _controller.clear();
-    _dbHelper.insertChatMessage({
-      DatabaseHelper.columnMessage: text,
-      DatabaseHelper.columnIsSent: 1,
-      DatabaseHelper.columnTimestamp: DateTime.now().millisecondsSinceEpoch,
-      DatabaseHelper.columnContactId: widget.contactPhoneNumber,
-    });
+    _dbHelper.insertChatMessage(ChatMessage(
+      contactId: widget.contactPhoneNumber,
+      message: text,
+      isSent: true,
+      timestamp: DateTime.now().millisecondsSinceEpoch,
+    ).toMap());
     sendSMS(text, widget.contactPhoneNumber);
   }
 
@@ -58,15 +59,28 @@ class _ChatPageState extends State<ChatPage> {
 
   void listenForSMS() {
     telephony.listenIncomingSms(
-      onNewMessage: (SmsMessage message) {
-        if (message.address == widget.contactPhoneNumber) {
-          _dbHelper.insertChatMessage({
-            DatabaseHelper.columnMessage: message.body ?? '',
-            DatabaseHelper.columnIsSent: 0,
-            DatabaseHelper.columnTimestamp: DateTime.now().millisecondsSinceEpoch,
-            DatabaseHelper.columnContactId: widget.contactPhoneNumber,
+      onNewMessage: (SmsMessage message) async {
+        final contactPhoneNumber = message.address ?? '';
+        final contactExists = await _dbHelper.queryChatMessagesByContactId(contactPhoneNumber);
+
+        if (contactExists.isEmpty) {
+          print("Contact does not exist, creating new contact");
+          await _dbHelper.insert({
+            DatabaseHelper.columnName: contactPhoneNumber,
+            DatabaseHelper.columnPhoneNumber: contactPhoneNumber,
+            DatabaseHelper.columnEmail: '',
+            DatabaseHelper.columnAddress: '',
+            DatabaseHelper.columnCompany: '',
+            DatabaseHelper.columnImagePath: '',
           });
         }
+
+        _dbHelper.insertChatMessage(ChatMessage(
+          contactId: contactPhoneNumber,
+          message: message.body ?? '',
+          isSent: false,
+          timestamp: DateTime.now().millisecondsSinceEpoch,
+        ).toMap());
       },
       onBackgroundMessage: backgroundMessageHandler,
     );
@@ -89,7 +103,7 @@ class _ChatPageState extends State<ChatPage> {
       body: Column(
         children: <Widget>[
           Expanded(
-            child: StreamBuilder<List<Map<String, dynamic>>>(
+            child: StreamBuilder<List<ChatMessage>>(
               stream: _messagesStream,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -106,7 +120,7 @@ class _ChatPageState extends State<ChatPage> {
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
                       final message = messages[index];
-                      final isSent = message[DatabaseHelper.columnIsSent] == 1;
+                      final isSent = message.isSent;
                       return Align(
                         alignment: isSent ? Alignment.centerRight : Alignment.centerLeft,
                         child: Container(
@@ -120,14 +134,14 @@ class _ChatPageState extends State<ChatPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                message[DatabaseHelper.columnMessage],
+                                message.message,
                                 style: TextStyle(
                                   color: isSent ? Colors.black : Colors.black87,
                                 ),
                               ),
                               Text(
                                 DateTime.fromMillisecondsSinceEpoch(
-                                  message[DatabaseHelper.columnTimestamp],
+                                  message.timestamp,
                                 ).toString(),
                                 style: TextStyle(
                                   fontSize: 10.0,
@@ -166,11 +180,11 @@ void backgroundMessageHandler(SmsMessage message) async {
   final dbHelper = DatabaseHelper.instance;
 
   if (message.address == message.address) {
-    dbHelper.insertChatMessage({
-      DatabaseHelper.columnMessage: message.body ?? '',
-      DatabaseHelper.columnIsSent: 0,
-      DatabaseHelper.columnTimestamp: DateTime.now().millisecondsSinceEpoch,
-      DatabaseHelper.columnContactId: message.address,
-    });
+    dbHelper.insertChatMessage(ChatMessage(
+      contactId: message.address ?? '',
+      message: message.body ?? '',
+      isSent: false,
+      timestamp: DateTime.now().millisecondsSinceEpoch,
+    ).toMap());
   }
 }

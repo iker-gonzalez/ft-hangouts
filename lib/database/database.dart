@@ -4,7 +4,7 @@ import 'package:path/path.dart';
 
 class DatabaseHelper {
   static const _databaseName = "MyDatabase.db";
-  static const _databaseVersion = 1;
+  static const _databaseVersion = 2; // Incremented version
 
   static const tableContacts = 'contacts';
   static const tableChatMessages = 'chat_messages';
@@ -28,7 +28,9 @@ class DatabaseHelper {
 
   // Only have a single app-wide reference to the database
   static Database? _database;
-  final _controller = StreamController<List<Map<String, dynamic>>>.broadcast();
+  final _contactStreamController = StreamController<void>.broadcast();
+
+  Stream<void> get contactUpdateStream => _contactStreamController.stream;
 
   Future<Database> get database async {
     if (_database != null) return _database!;
@@ -41,22 +43,9 @@ class DatabaseHelper {
   }
 
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 5) {
-      await db.execute('ALTER TABLE $tableChatMessages RENAME TO temp_chat_messages');
-      await db.execute('''
-        CREATE TABLE $tableChatMessages (
-          $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
-          $columnContactId TEXT NOT NULL,
-          $columnMessage TEXT NOT NULL,
-          $columnIsSent INTEGER NOT NULL,
-          $columnTimestamp INTEGER NOT NULL
-        )
-      ''');
-      await db.execute('''
-        INSERT INTO $tableChatMessages ($columnId, $columnContactId, $columnMessage, $columnIsSent, $columnTimestamp)
-        SELECT $columnId, senderPhoneNumber, $columnMessage, $columnIsSent, $columnTimestamp FROM temp_chat_messages
-      ''');
-      await db.execute('DROP TABLE temp_chat_messages');
+    if (oldVersion < 2) {
+      // Example schema change: Add a new column to chat_messages table
+      await db.execute('ALTER TABLE $tableChatMessages ADD COLUMN new_column_name TEXT');
     }
   }
 
@@ -95,7 +84,9 @@ class DatabaseHelper {
 
   Future<int> insert(Map<String, dynamic> row) async {
     Database db = await instance.database;
-    return await db.insert(tableContacts, row);
+    int id = await db.insert(tableContacts, row);
+    _contactStreamController.add(null); // Notify listeners of the update
+    return id;
   }
 
   Future<List<Map<String, dynamic>>> queryAllRows() async {
@@ -112,17 +103,23 @@ class DatabaseHelper {
   Future<int> update(Map<String, dynamic> row) async {
     Database db = await instance.database;
     int id = int.parse(row[columnId]);
-    return await db.update(tableContacts, row, where: '$columnId = ?', whereArgs: [id]);
+    int result = await db.update(tableContacts, row, where: '$columnId = ?', whereArgs: [id]);
+    _contactStreamController.add(null); // Notify listeners of the update
+    return result;
   }
 
   Future<int> delete(int id) async {
     Database db = await instance.database;
-    return await db.delete(tableContacts, where: '$columnId = ?', whereArgs: [id]);
+    int result = await db.delete(tableContacts, where: '$columnId = ?', whereArgs: [id]);
+    _contactStreamController.add(null); // Notify listeners of the update
+    return result;
   }
 
   Future<int> deleteAllRows() async {
     Database db = await instance.database;
-    return await db.delete(tableContacts);
+    int result = await db.delete(tableContacts);
+    _contactStreamController.add(null); // Notify listeners of the update
+    return result;
   }
 
   Future<List<Map<String, dynamic>>> queryAllChatMessages() async {
@@ -132,9 +129,6 @@ class DatabaseHelper {
 
   Stream<List<Map<String, dynamic>>> getMessagesStream(String contactPhoneNumber) async* {
     yield await queryChatMessagesByContactId(contactPhoneNumber);
-    yield* _controller.stream.map((messages) {
-      return messages.where((message) => message[columnContactId] == contactPhoneNumber).toList();
-    });
   }
 
   Future<List<Map<String, dynamic>>> queryChatMessagesByContactId(String contactPhoneNumber) async {
@@ -150,11 +144,10 @@ class DatabaseHelper {
   Future<int> insertChatMessage(Map<String, dynamic> row) async {
     Database db = await instance.database;
     int id = await db.insert(tableChatMessages, row);
-    _controller.add(await queryAllChatMessages());
     return id;
   }
 
   void dispose() {
-    _controller.close();
+    _contactStreamController.close();
   }
 }

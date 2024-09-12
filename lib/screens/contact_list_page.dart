@@ -14,11 +14,17 @@ class ContactListPage extends StatefulWidget {
 class _ContactListPageState extends State<ContactListPage> {
   late Future<List<Map<String, dynamic>>> _contactListFuture;
   final Telephony telephony = Telephony.instance;
+  final DatabaseHelper _dbHelper = DatabaseHelper.instance;
 
   @override
   void initState() {
     super.initState();
-    _contactListFuture = DatabaseHelper.instance.queryAllRows();
+    _contactListFuture = _dbHelper.queryAllRows();
+    _dbHelper.contactUpdateStream.listen((_) {
+      setState(() {
+        _contactListFuture = _dbHelper.queryAllRows();
+      });
+    });
   }
 
   void _makeCall(String phoneNumber) async {
@@ -65,9 +71,7 @@ class _ContactListPageState extends State<ContactListPage> {
                     children: [
                       IconButton(
                         icon: const Icon(Icons.call),
-                        onPressed: () {
-                          _makeCall(contact[DatabaseHelper.columnPhoneNumber]);
-                        },
+                        onPressed: () => _makeCall(contact[DatabaseHelper.columnPhoneNumber]),
                       ),
                       IconButton(
                         icon: const Icon(Icons.chat),
@@ -86,10 +90,7 @@ class _ContactListPageState extends State<ContactListPage> {
                       IconButton(
                         icon: const Icon(Icons.delete),
                         onPressed: () async {
-                          await DatabaseHelper.instance.delete(contact[DatabaseHelper.columnId]);
-                          setState(() {
-                            _contactListFuture = DatabaseHelper.instance.queryAllRows();
-                          });
+                          await _dbHelper.delete(contact[DatabaseHelper.columnId]);
                         },
                       ),
                     ],
@@ -100,11 +101,7 @@ class _ContactListPageState extends State<ContactListPage> {
                       MaterialPageRoute(
                         builder: (context) => ContactEditPage(contact: contact),
                       ),
-                    ).then((_) {
-                      setState(() {
-                        _contactListFuture = DatabaseHelper.instance.queryAllRows();
-                      });
-                    });
+                    );
                   },
                 );
               },
@@ -122,11 +119,7 @@ class _ContactListPageState extends State<ContactListPage> {
             MaterialPageRoute(
               builder: (context) => const ContactEditPage(),
             ),
-          ).then((_) {
-            setState(() {
-              _contactListFuture = DatabaseHelper.instance.queryAllRows();
-            });
-          });
+          );
         },
       ),
     );
