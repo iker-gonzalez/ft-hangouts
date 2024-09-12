@@ -29,8 +29,10 @@ class DatabaseHelper {
   // Only have a single app-wide reference to the database
   static Database? _database;
   final _contactStreamController = StreamController<void>.broadcast();
+  final _chatMessageStreamController = StreamController<void>.broadcast();
 
   Stream<void> get contactUpdateStream => _contactStreamController.stream;
+  Stream<void> get chatMessageUpdateStream => _chatMessageStreamController.stream;
 
   Future<Database> get database async {
     if (_database != null) return _database!;
@@ -89,6 +91,13 @@ class DatabaseHelper {
     return id;
   }
 
+  Future<int> insertChatMessage(Map<String, dynamic> row) async {
+    Database db = await instance.database;
+    int id = await db.insert(tableChatMessages, row);
+    _chatMessageStreamController.add(null); // Notify listeners of the new message
+    return id;
+  }
+
   Future<List<Map<String, dynamic>>> queryAllRows() async {
     Database db = await instance.database;
     return await db.query(tableContacts);
@@ -141,13 +150,8 @@ class DatabaseHelper {
     );
   }
 
-  Future<int> insertChatMessage(Map<String, dynamic> row) async {
-    Database db = await instance.database;
-    int id = await db.insert(tableChatMessages, row);
-    return id;
-  }
-
   void dispose() {
     _contactStreamController.close();
+    _chatMessageStreamController.close();
   }
 }

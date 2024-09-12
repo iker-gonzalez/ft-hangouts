@@ -1,6 +1,7 @@
 import 'package:telephony/telephony.dart';
 import 'package:flutter/material.dart';
 import 'package:ft_hangouts/database/database.dart';
+import 'package:rxdart/rxdart.dart';
 import '../models/chat_message.dart';
 
 class ChatPage extends StatefulWidget {
@@ -27,10 +28,22 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
-    _messagesStream = _dbHelper.getMessagesStream(widget.contactPhoneNumber).map(
-          (event) => event.map((e) => ChatMessage.fromMap(e)).toList(),
-    );
+    _initializeMessagesStream();
     listenForSMS();
+  }
+
+  void _initializeMessagesStream() {
+    final initialMessagesStream = Stream.fromFuture(
+      _dbHelper.queryChatMessagesByContactId(widget.contactPhoneNumber).then(
+            (event) => event.map((e) => ChatMessage.fromMap(e)).toList(),
+      ),
+    ).asBroadcastStream();
+
+    final updateMessagesStream = _dbHelper.chatMessageUpdateStream.asyncMap((_) => _dbHelper.queryChatMessagesByContactId(widget.contactPhoneNumber).then(
+          (event) => event.map((e) => ChatMessage.fromMap(e)).toList(),
+    ));
+
+    _messagesStream = Rx.merge([initialMessagesStream, updateMessagesStream]);
   }
 
   void _sendMessage(String text) {
