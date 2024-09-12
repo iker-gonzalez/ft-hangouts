@@ -13,11 +13,25 @@ class ContactListPage extends StatefulWidget {
 
 class _ContactListPageState extends State<ContactListPage> {
   late Future<List<Map<String, dynamic>>> _contactListFuture;
+  final Telephony telephony = Telephony.instance;
 
   @override
   void initState() {
     super.initState();
     _contactListFuture = DatabaseHelper.instance.queryAllRows();
+  }
+
+  void _makeCall(String phoneNumber) async {
+    bool? permissionsGranted = await telephony.requestPhonePermissions;
+    if (permissionsGranted != null && permissionsGranted) {
+      try {
+        await telephony.dialPhoneNumber(phoneNumber);
+      } catch (e) {
+        print("Failed to make call: $e");
+      }
+    } else {
+      print("Phone call permissions not granted");
+    }
   }
 
   @override
@@ -49,6 +63,12 @@ class _ContactListPageState extends State<ContactListPage> {
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      IconButton(
+                        icon: const Icon(Icons.call),
+                        onPressed: () {
+                          _makeCall(contact[DatabaseHelper.columnPhoneNumber]);
+                        },
+                      ),
                       IconButton(
                         icon: const Icon(Icons.chat),
                         onPressed: () {
