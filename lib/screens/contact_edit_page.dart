@@ -112,7 +112,9 @@ class ContactEditPageState extends State<ContactEditPage> {
                 } else {
                   await DatabaseHelper.instance.insert(contact);
                 }
-                Navigator.pop(context);
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
               },
             ),
           ],

@@ -16,10 +16,10 @@ class ChatPage extends StatefulWidget {
   });
 
   @override
-  _ChatPageState createState() => _ChatPageState();
+  ChatPageState createState() => ChatPageState();
 }
 
-class _ChatPageState extends State<ChatPage> {
+class ChatPageState extends State<ChatPage> {
   final _controller = TextEditingController();
   final _dbHelper = DatabaseHelper.instance;
   final Telephony telephony = Telephony.instance;

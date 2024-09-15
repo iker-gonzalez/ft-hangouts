@@ -12,21 +12,21 @@ class ContactListPage extends StatefulWidget {
   const ContactListPage({super.key, required this.localeNotifier});
 
   @override
-  _ContactListPageState createState() => _ContactListPageState();
+  ContactListPageState createState() => ContactListPageState();
 }
 
-class _ContactListPageState extends State<ContactListPage> {
-  late Future<List<Map<String, dynamic>>> _contactListFuture;
+class ContactListPageState extends State<ContactListPage> {
+  late Future<List<Map<String, dynamic>>> contactListFuture;
   final Telephony telephony = Telephony.instance;
   final DatabaseHelper _dbHelper = DatabaseHelper.instance;
 
   @override
   void initState() {
     super.initState();
-    _contactListFuture = _dbHelper.queryAllRows();
+    contactListFuture = _dbHelper.queryAllRows();
     _dbHelper.contactUpdateStream.listen((_) {
       setState(() {
-        _contactListFuture = _dbHelper.queryAllRows();
+        contactListFuture = _dbHelper.queryAllRows();
       });
     });
   }
@@ -52,7 +52,7 @@ class _ContactListPageState extends State<ContactListPage> {
 
     return Scaffold(
       body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: _contactListFuture,
+        future: contactListFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             final contacts = snapshot.data ?? [];

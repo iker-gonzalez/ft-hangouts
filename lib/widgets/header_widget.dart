@@ -6,19 +6,19 @@ class HeaderComponent extends StatefulWidget implements PreferredSizeWidget {
   const HeaderComponent({super.key, required this.localeNotifier});
 
   @override
-  _HeaderComponentState createState() => _HeaderComponentState();
+  HeaderComponentState createState() => HeaderComponentState();
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight); // Default AppBar height
 }
 
-class _HeaderComponentState extends State<HeaderComponent> {
-  final ValueNotifier<Color> _colorNotifier = ValueNotifier(const Color.fromARGB(255, 230, 141, 134));
+class HeaderComponentState extends State<HeaderComponent> {
+  final ValueNotifier<Color> colorNotifier = ValueNotifier(const Color.fromARGB(255, 230, 141, 134));
 
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<Color>(
-      valueListenable: _colorNotifier,
+      valueListenable: colorNotifier,
       builder: (context, color, child) {
         return AppBar(
           backgroundColor: color,
@@ -31,7 +31,7 @@ class _HeaderComponentState extends State<HeaderComponent> {
                   IconButton(
                     icon: const Icon(Icons.color_lens),
                     onPressed: () {
-                      _colorNotifier.value = _colorNotifier.value == const Color.fromARGB(255, 230, 141, 134) ? const Color.fromARGB(255, 155, 192, 221) : const Color.fromARGB(255, 230, 141, 134);
+                      colorNotifier.value = colorNotifier.value == const Color.fromARGB(255, 230, 141, 134) ? const Color.fromARGB(255, 155, 192, 221) : const Color.fromARGB(255, 230, 141, 134);
                     },
                   ),
                   IconButton(

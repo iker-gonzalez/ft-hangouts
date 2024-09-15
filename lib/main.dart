@@ -27,11 +27,11 @@ class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
-  _MyAppState createState() => _MyAppState();
+  MyAppState createState() => MyAppState();
 }
 
-class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
-  final ValueNotifier<Locale> _localeNotifier = ValueNotifier(const Locale('en', 'US'));
+class MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  final ValueNotifier<Locale> localeNotifier = ValueNotifier(const Locale('en', 'US'));
   DateTime? _backgroundTime;
   final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
   bool _snackBarShown = false;
@@ -69,7 +69,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<Locale>(
-      valueListenable: _localeNotifier,
+      valueListenable: localeNotifier,
       builder: (context, locale, child) {
         return MaterialApp(
           locale: locale,
@@ -82,8 +82,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           supportedLocales: S.delegate.supportedLocales,
           scaffoldMessengerKey: _scaffoldMessengerKey,
           home: Scaffold(
-            appBar: HeaderComponent(localeNotifier: _localeNotifier),
-            body: ContactListPage(localeNotifier: _localeNotifier),
+            appBar: HeaderComponent(localeNotifier: localeNotifier),
+            body: ContactListPage(localeNotifier: localeNotifier),
           ),
         );
       },
