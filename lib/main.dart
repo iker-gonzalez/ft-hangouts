@@ -20,10 +20,12 @@ void backgroundMessageHandler(SmsMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Ensure Flutter is initialized
   await DatabaseHelper.instance.database; // Initialize database
-  runApp(MyApp()); // Ensure MyApp is not instantiated as const
+  runApp(const MyApp()); // Ensure MyApp is not instantiated as const
 }
 
 class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
   @override
   _MyAppState createState() => _MyAppState();
 }
@@ -71,7 +73,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       builder: (context, locale, child) {
         return MaterialApp(
           locale: locale,
-          localizationsDelegates: [
+          localizationsDelegates: const [
             S.delegate,
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,

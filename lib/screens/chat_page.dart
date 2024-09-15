@@ -137,8 +137,8 @@ class _ChatPageState extends State<ChatPage> {
                       return Align(
                         alignment: isSent ? Alignment.centerRight : Alignment.centerLeft,
                         child: Container(
-                          padding: EdgeInsets.all(8.0),
-                          margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                          padding: const EdgeInsets.all(8.0),
+                          margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                           decoration: BoxDecoration(
                             color: isSent ? Colors.blue[100] : Colors.grey[300],
                             borderRadius: BorderRadius.circular(8.0),
@@ -156,7 +156,7 @@ class _ChatPageState extends State<ChatPage> {
                                 DateTime.fromMillisecondsSinceEpoch(
                                   message.timestamp,
                                 ).toString(),
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 10.0,
                                   color: Colors.black54,
                                 ),
