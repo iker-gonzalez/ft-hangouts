@@ -32,6 +32,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   final ValueNotifier<Locale> _localeNotifier = ValueNotifier(const Locale('en', 'US'));
   DateTime? _backgroundTime;
   final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+  bool _snackBarShown = false;
 
   @override
   void initState() {
@@ -49,13 +50,15 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused) {
       _backgroundTime = DateTime.now();
+      _snackBarShown = false;
     } else if (state == AppLifecycleState.resumed) {
-      if (_backgroundTime != null) {
+      if (_backgroundTime != null && !_snackBarShown) {
         final timeInBackground = DateTime.now().difference(_backgroundTime!);
         WidgetsBinding.instance.addPostFrameCallback((_) {
           _scaffoldMessengerKey.currentState?.showSnackBar(
             SnackBar(content: Text('App was in background for ${timeInBackground.inSeconds} seconds')),
           );
+          _snackBarShown = true;
         });
       }
     }
