@@ -46,6 +46,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: any
+  logger: ^1.0.0
 
   firebase_core: any
 dev_dependencies:

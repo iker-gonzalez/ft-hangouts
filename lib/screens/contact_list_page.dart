@@ -4,6 +4,7 @@ import 'package:ft_hangouts/database/database.dart';
 import 'contact_edit_page.dart';
 import 'chat_page.dart';
 import 'package:ft_hangouts/generated/l10n.dart';
+import 'package:logger/logger.dart';
 
 class ContactListPage extends StatefulWidget {
   final ValueNotifier<Locale> localeNotifier;
@@ -30,16 +31,18 @@ class _ContactListPageState extends State<ContactListPage> {
     });
   }
 
+  final logger = Logger();
+
   void _makeCall(String phoneNumber) async {
     bool? permissionsGranted = await telephony.requestPhonePermissions;
     if (permissionsGranted != null && permissionsGranted) {
       try {
         await telephony.dialPhoneNumber(phoneNumber);
       } catch (e) {
-        print("Failed to make call: $e");
+        logger.e("Failed to make call: $e");
       }
     } else {
-      print("Phone call permissions not granted");
+      logger.w("Phone call permissions not granted");
     }
   }
 

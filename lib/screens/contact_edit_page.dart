@@ -5,6 +5,7 @@ import '../database/database.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
+import 'package:logger/logger.dart';
 
 class ContactEditPage extends StatefulWidget {
   final Map<String, dynamic>? contact;
@@ -25,6 +26,8 @@ class ContactEditPageState extends State<ContactEditPage> {
   final ImagePicker _picker = ImagePicker();
   File? _imageFile;
 
+  final logger = Logger();
+
   Future<void> _pickImage() async {
     try {
       final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
@@ -37,7 +40,7 @@ class ContactEditPageState extends State<ContactEditPage> {
         });
       }
     } catch (e) {
-      print('An error occurred while picking the image: $e');
+      logger.e('An error occurred while picking the image: $e');
     }
   }
 

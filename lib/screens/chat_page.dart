@@ -2,7 +2,8 @@ import 'package:telephony/telephony.dart';
 import 'package:flutter/material.dart';
 import 'package:ft_hangouts/database/database.dart';
 import 'package:rxdart/rxdart.dart';
-import '../models/chat_message.dart';
+import 'package:ft_hangouts/models/chat_message.dart';
+import 'package:logger/logger.dart';
 
 class ChatPage extends StatefulWidget {
   final String contactPhoneNumber;
@@ -57,16 +58,18 @@ class _ChatPageState extends State<ChatPage> {
     sendSMS(text, widget.contactPhoneNumber);
   }
 
+  final logger = Logger();
+
   void sendSMS(String message, String recipient) async {
     bool? permissionsGranted = await telephony.requestSmsPermissions;
     if (permissionsGranted != null && permissionsGranted) {
       try {
         await telephony.sendSms(to: recipient, message: message);
       } catch (e) {
-        print("Failed to send SMS: $e");
+        logger.e("Failed to send SMS: $e");
       }
     } else {
-      print("SMS permissions not granted");
+      logger.w("SMS permissions not granted");
     }
   }
 
@@ -77,7 +80,7 @@ class _ChatPageState extends State<ChatPage> {
         final contactExists = await _dbHelper.queryChatMessagesByContactId(contactPhoneNumber);
 
         if (contactExists.isEmpty) {
-          print("Contact does not exist, creating new contact");
+          logger.i("Contact does not exist, creating new contact");
           await _dbHelper.insert({
             DatabaseHelper.columnName: contactPhoneNumber,
             DatabaseHelper.columnPhoneNumber: contactPhoneNumber,
