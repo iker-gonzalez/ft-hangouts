@@ -28,8 +28,38 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   final ValueNotifier<Locale> _localeNotifier = ValueNotifier(const Locale('en', 'US'));
+  DateTime? _backgroundTime;
+  final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      _backgroundTime = DateTime.now();
+    } else if (state == AppLifecycleState.resumed) {
+      if (_backgroundTime != null) {
+        final timeInBackground = DateTime.now().difference(_backgroundTime!);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _scaffoldMessengerKey.currentState?.showSnackBar(
+            SnackBar(content: Text('App was in background for ${timeInBackground.inSeconds} seconds')),
+          );
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +77,7 @@ class _MyAppState extends State<MyApp> {
             const Locale('en', 'US'),
             const Locale('es', 'ES'),
           ],
+          scaffoldMessengerKey: _scaffoldMessengerKey,
           home: Scaffold(
             appBar: HeaderComponent(localeNotifier: _localeNotifier),
             body: ContactListPage(localeNotifier: _localeNotifier),
