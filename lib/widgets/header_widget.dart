@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class HeaderComponent extends StatefulWidget implements PreferredSizeWidget {
-  const HeaderComponent({super.key});
+  final ValueNotifier<Locale> localeNotifier;
+
+  const HeaderComponent({super.key, required this.localeNotifier});
 
   @override
   _HeaderComponentState createState() => _HeaderComponentState();
@@ -12,7 +14,6 @@ class HeaderComponent extends StatefulWidget implements PreferredSizeWidget {
 
 class _HeaderComponentState extends State<HeaderComponent> {
   final ValueNotifier<Color> _colorNotifier = ValueNotifier(const Color.fromARGB(255, 230, 141, 134));
-  final ValueNotifier<Locale> _localeNotifier = ValueNotifier(const Locale('en', 'US'));
 
   @override
   Widget build(BuildContext context) {
@@ -36,8 +37,7 @@ class _HeaderComponentState extends State<HeaderComponent> {
                   IconButton(
                     icon: const Icon(Icons.language),
                     onPressed: () {
-                      _localeNotifier.value = _localeNotifier.value.languageCode == 'en' ? const Locale('es', 'ES') : const Locale('en', 'US');
-                      // You need to implement the actual language switching in your app
+                      widget.localeNotifier.value = widget.localeNotifier.value.languageCode == 'en' ? const Locale('es', 'ES') : const Locale('en', 'US');
                     },
                   ),
                 ],

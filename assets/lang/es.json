@@ -1,0 +1,11 @@
+{
+  "title": "Contactos",
+  "add_contact": "Agregar Contacto",
+  "phone": "Teléfono",
+  "email": "Correo Electrónico",
+  "address": "Dirección",
+  "company": "Empresa",
+  "call": "Llamar",
+  "chat": "Chat",
+  "delete": "Eliminar"
+}

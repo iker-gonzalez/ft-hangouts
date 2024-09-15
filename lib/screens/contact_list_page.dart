@@ -1,11 +1,15 @@
+// lib/screens/contact_list_page.dart
 import 'package:flutter/material.dart';
 import 'package:telephony/telephony.dart';
-import '../database/database.dart';
+import 'package:ft_hangouts/database/database.dart';
 import 'contact_edit_page.dart';
 import 'chat_page.dart';
+import 'package:ft_hangouts/models/localization.dart';
 
 class ContactListPage extends StatefulWidget {
-  const ContactListPage({super.key});
+  final ValueNotifier<Locale> localeNotifier;
+
+  const ContactListPage({super.key, required this.localeNotifier});
 
   @override
   _ContactListPageState createState() => _ContactListPageState();
@@ -42,10 +46,9 @@ class _ContactListPageState extends State<ContactListPage> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Contacts'),
-      ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: _contactListFuture,
         builder: (context, snapshot) {
@@ -60,10 +63,10 @@ class _ContactListPageState extends State<ContactListPage> {
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Phone: ${contact[DatabaseHelper.columnPhoneNumber]}'),
-                      Text('Email: ${contact[DatabaseHelper.columnEmail]}'),
-                      Text('Address: ${contact[DatabaseHelper.columnAddress]}'),
-                      Text('Company: ${contact[DatabaseHelper.columnCompany]}'),
+                      Text('${localizations.translate('phone')}: ${contact[DatabaseHelper.columnPhoneNumber]}'),
+                      Text('${localizations.translate('email')}: ${contact[DatabaseHelper.columnEmail]}'),
+                      Text('${localizations.translate('address')}: ${contact[DatabaseHelper.columnAddress]}'),
+                      Text('${localizations.translate('company')}: ${contact[DatabaseHelper.columnCompany]}'),
                     ],
                   ),
                   trailing: Row(

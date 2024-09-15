@@ -1,0 +1,11 @@
+{
+  "title": "Contacts",
+  "add_contact": "Add Contact",
+  "phone": "Phone",
+  "email": "Email",
+  "address": "Address",
+  "company": "Company",
+  "call": "Call",
+  "chat": "Chat",
+  "delete": "Delete"
+}
