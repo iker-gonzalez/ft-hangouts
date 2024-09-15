@@ -1,10 +1,9 @@
-// lib/screens/contact_list_page.dart
 import 'package:flutter/material.dart';
 import 'package:telephony/telephony.dart';
 import 'package:ft_hangouts/database/database.dart';
 import 'contact_edit_page.dart';
 import 'chat_page.dart';
-import 'package:ft_hangouts/models/localization.dart';
+import 'package:ft_hangouts/generated/l10n.dart';
 
 class ContactListPage extends StatefulWidget {
   final ValueNotifier<Locale> localeNotifier;
@@ -46,7 +45,7 @@ class _ContactListPageState extends State<ContactListPage> {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+    final localizations = S.of(context);
 
     return Scaffold(
       body: FutureBuilder<List<Map<String, dynamic>>>(
@@ -63,10 +62,10 @@ class _ContactListPageState extends State<ContactListPage> {
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('${localizations.translate('phone')}: ${contact[DatabaseHelper.columnPhoneNumber]}'),
-                      Text('${localizations.translate('email')}: ${contact[DatabaseHelper.columnEmail]}'),
-                      Text('${localizations.translate('address')}: ${contact[DatabaseHelper.columnAddress]}'),
-                      Text('${localizations.translate('company')}: ${contact[DatabaseHelper.columnCompany]}'),
+                      Text('${localizations.phone}: ${contact[DatabaseHelper.columnPhoneNumber]}'),
+                      Text('${localizations.email}: ${contact[DatabaseHelper.columnEmail]}'),
+                      Text('${localizations.address}: ${contact[DatabaseHelper.columnAddress]}'),
+                      Text('${localizations.company}: ${contact[DatabaseHelper.columnCompany]}'),
                     ],
                   ),
                   trailing: Row(

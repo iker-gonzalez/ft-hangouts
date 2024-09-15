@@ -1,0 +1,16 @@
+{
+  "editContact": "Editar Contacto",
+  "pickImage": "Seleccionar Imagen",
+  "name": "Nombre",
+  "phoneNumber": "Número de Teléfono",
+  "email": "Correo Electrónico",
+  "address": "Dirección",
+  "company": "Empresa",
+  "save": "Guardar",
+  "contacts": "Contactos",
+  "addContact": "Agregar Contacto",
+  "phone": "Teléfono",
+  "call": "Llamar",
+  "chat": "Chat",
+  "delete": "Eliminar"
+}

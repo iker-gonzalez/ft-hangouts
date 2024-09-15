@@ -1,0 +1,16 @@
+{
+  "editContact": "Edit Contact",
+  "pickImage": "Pick Image",
+  "name": "Name",
+  "phoneNumber": "Phone Number",
+  "email": "Email",
+  "address": "Address",
+  "company": "Company",
+  "save": "Save",
+  "contacts": "Contacts",
+  "addContact": "Add Contact",
+  "phone": "Phone",
+  "call": "Call",
+  "chat": "Chat",
+  "delete": "Delete"
+}

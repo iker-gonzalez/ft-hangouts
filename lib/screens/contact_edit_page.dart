@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:ft_hangouts/generated/l10n.dart';
 import '../database/database.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -56,9 +57,11 @@ class ContactEditPageState extends State<ContactEditPage> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = S.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Contact'),
+        title: Text(localizations.editContact),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -67,30 +70,30 @@ class ContactEditPageState extends State<ContactEditPage> {
             if (_imageFile != null) Image.file(_imageFile!),
             TextButton(
               onPressed: _pickImage,
-              child: const Text('Pick Image'),
+              child: Text(localizations.pickImage),
             ),
             TextField(
               controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Name'),
+              decoration: InputDecoration(labelText: localizations.name),
             ),
             TextField(
               controller: _phoneNumberController,
-              decoration: const InputDecoration(labelText: 'Phone Number'),
+              decoration: InputDecoration(labelText: localizations.phoneNumber),
             ),
             TextField(
               controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
+              decoration: InputDecoration(labelText: localizations.email),
             ),
             TextField(
               controller: _addressController,
-              decoration: const InputDecoration(labelText: 'Address'),
+              decoration: InputDecoration(labelText: localizations.address),
             ),
             TextField(
               controller: _companyController,
-              decoration: const InputDecoration(labelText: 'Company'),
+              decoration: InputDecoration(labelText: localizations.company),
             ),
             ElevatedButton(
-              child: const Text('Save'),
+              child: Text(localizations.save),
               onPressed: () async {
                 final contact = {
                   DatabaseHelper.columnName: _nameController.text,

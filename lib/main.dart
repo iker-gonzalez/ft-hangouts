@@ -4,7 +4,7 @@ import 'screens/contact_list_page.dart';
 import 'package:ft_hangouts/database/database.dart';
 import 'package:ft_hangouts/widgets/header_widget.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:ft_hangouts/models/localization.dart';
+import 'package:ft_hangouts/generated/l10n.dart';
 
 // Top-level function to handle background messages
 void backgroundMessageHandler(SmsMessage message) async {
@@ -72,14 +72,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         return MaterialApp(
           locale: locale,
           localizationsDelegates: [
-            AppLocalizations.delegate,
+            S.delegate,
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
           ],
-          supportedLocales: [
-            const Locale('en', 'US'),
-            const Locale('es', 'ES'),
-          ],
+          supportedLocales: S.delegate.supportedLocales,
           scaffoldMessengerKey: _scaffoldMessengerKey,
           home: Scaffold(
             appBar: HeaderComponent(localeNotifier: _localeNotifier),
