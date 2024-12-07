@@ -28,6 +28,8 @@ class ContactEditPageState extends State<ContactEditPage> {
 
   final logger = Logger();
 
+  bool _validate = false;
+
   Future<void> _pickImage() async {
     try {
       final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
@@ -77,15 +79,27 @@ class ContactEditPageState extends State<ContactEditPage> {
             ),
             TextField(
               controller: _nameController,
-              decoration: InputDecoration(labelText: localizations.name),
+              decoration: InputDecoration(
+                labelText: '${localizations.name} *',
+                errorText: _validate ? _validateName(_nameController.text) : null,
+              ),
+              keyboardType: TextInputType.name,
             ),
             TextField(
               controller: _phoneNumberController,
-              decoration: InputDecoration(labelText: localizations.phoneNumber),
+              decoration: InputDecoration(
+                labelText: '${localizations.phoneNumber} *',
+                errorText: _validate ? _validatePhoneNumber(_phoneNumberController.text) : null,
+              ),
+              keyboardType: TextInputType.phone,
             ),
             TextField(
               controller: _emailController,
-              decoration: InputDecoration(labelText: localizations.email),
+              decoration: InputDecoration(
+                labelText: '${localizations.email} *',
+                errorText: _validate ? _validateEmail(_emailController.text) : null,
+              ),
+              keyboardType: TextInputType.emailAddress,
             ),
             TextField(
               controller: _addressController,
@@ -98,22 +112,32 @@ class ContactEditPageState extends State<ContactEditPage> {
             ElevatedButton(
               child: Text(localizations.save),
               onPressed: () async {
-                final contact = {
-                  DatabaseHelper.columnName: _nameController.text,
-                  DatabaseHelper.columnPhoneNumber: _phoneNumberController.text,
-                  DatabaseHelper.columnEmail: _emailController.text,
-                  DatabaseHelper.columnAddress: _addressController.text,
-                  DatabaseHelper.columnCompany: _companyController.text,
-                  DatabaseHelper.columnImagePath: _imageFile?.path,
-                };
-                if (widget.contact != null) {
-                  contact[DatabaseHelper.columnId] = widget.contact![DatabaseHelper.columnId].toString();
-                  await DatabaseHelper.instance.update(contact);
-                } else {
-                  await DatabaseHelper.instance.insert(contact);
-                }
-                if (context.mounted) {
-                  Navigator.pop(context);
+                setState(() {
+                  _validate = true;
+                });
+                // Validate before saving
+                if (_validateName(_nameController.text) == null &&
+                    _validatePhoneNumber(_phoneNumberController.text) == null &&
+                    _validateEmail(_emailController.text) == null) {
+                  final contact = {
+                    DatabaseHelper.columnName: _nameController.text,
+                    DatabaseHelper.columnPhoneNumber: _phoneNumberController.text,
+                    DatabaseHelper.columnEmail: _emailController.text,
+                    DatabaseHelper.columnAddress: _addressController.text,
+                    DatabaseHelper.columnCompany: _companyController.text,
+                    DatabaseHelper.columnImagePath: _imageFile?.path,
+                  };
+
+                  if (widget.contact != null) {
+                    contact[DatabaseHelper.columnId] = widget.contact![DatabaseHelper.columnId].toString();
+                    await DatabaseHelper.instance.update(contact);
+                  } else {
+                    await DatabaseHelper.instance.insert(contact);
+                  }
+
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                  }
                 }
               },
             ),
@@ -121,5 +145,34 @@ class ContactEditPageState extends State<ContactEditPage> {
         ),
       ),
     );
+  }
+
+  String? _validateName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Name is required';
+    }
+    return null;
+  }
+
+  String? _validatePhoneNumber(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Phone number is required';
+    }
+    // Check if the phone number contains only digits and is between 7 to 15 characters long
+    if (!RegExp(r'^\d{7,15}$').hasMatch(value)) {
+      return 'Phone number must be between 7 and 15 digits long';
+    }
+    return null;
+  }
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Email is required';
+    }
+    // More comprehensive email validation
+    if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(value)) {
+      return 'Enter a valid email address';
+    }
+    return null;
   }
 }
