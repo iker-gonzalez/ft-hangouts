@@ -77,9 +77,8 @@ class ChatPageState extends State<ChatPage> {
     telephony.listenIncomingSms(
       onNewMessage: (SmsMessage message) async {
         final contactPhoneNumber = message.address ?? '';
-        final contactExists = await _dbHelper.queryChatMessagesByContactId(contactPhoneNumber);
-
-        if (contactExists.isEmpty) {
+        final existingContact = await _dbHelper.queryContactByPhoneNumber(contactPhoneNumber);
+        if (existingContact.isEmpty) {
           logger.i("Contact does not exist, creating new contact");
           await _dbHelper.insert({
             DatabaseHelper.columnName: contactPhoneNumber,
@@ -91,7 +90,7 @@ class ChatPageState extends State<ChatPage> {
           });
         }
 
-        _dbHelper.insertChatMessage(ChatMessage(
+        await _dbHelper.insertChatMessage(ChatMessage(
           contactId: contactPhoneNumber,
           message: message.body ?? '',
           isSent: false,

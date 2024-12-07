@@ -150,6 +150,15 @@ class DatabaseHelper {
     );
   }
 
+  Future<List<Map<String, dynamic>>> queryContactByPhoneNumber(String phoneNumber) async {
+    Database db = await instance.database;
+    return await db.query(
+      tableContacts, // Corrected table name
+      where: '$columnPhoneNumber = ?',
+      whereArgs: [phoneNumber],
+    );
+  }
+
   void dispose() {
     _contactStreamController.close();
     _chatMessageStreamController.close();
